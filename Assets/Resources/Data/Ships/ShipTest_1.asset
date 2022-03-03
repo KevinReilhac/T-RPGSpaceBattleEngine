@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84c9cd53edbbf114f94d93f8fd9491f8, type: 3}
+  m_Name: ShipTest_1
+  m_EditorClassIdentifier: 
+  price: 1000
+  health: 100
+  actionPoints: 2
+  speed: 2
+  evade: 20
+  armor: 20
+  flac: 0
+  type: 0
+  attacks:
+  - {fileID: 11400000, guid: ae100a687476846469f64265866822c6, type: 2}
+  - {fileID: 11400000, guid: ee2d0c1e7097a48439ecf1349683aa50, type: 2}
+  sprite: {fileID: 21300000, guid: b22f842293ba68c4386b0326a05dc4bb, type: 3}
