@@ -26,6 +26,11 @@ public class GridPlacable : MonoBehaviour
 
 	protected void SetCell(Cell cell)
 	{
+		if (this.cell != null)
+		{
+			this.cell.PlacedObject = null;
+			this.cell.OnSelected.RemoveListener(OnCellSelected);
+		}
 		this.cell = cell;
 		cell.PlacedObject = this;
 		cell.OnSelected.AddListener(OnCellSelected);

@@ -22,9 +22,7 @@ public class GridMovable : GridPlacable
 		if (target == null)
 			return;
 
-		cell.PlacedObject = null;
-		cell = BattleManager.instance.GridMap.GetCell(moveGridPosition);
-		cell.PlacedObject = this;
+		SetCell(BattleManager.instance.GridMap.GetCell(moveGridPosition));
 		transform.DOMove(target, moveTime).SetEase(moveAnimationEaseCurve).OnComplete(() => {
 			if (onEndMove != null)
 				onEndMove.Invoke();
