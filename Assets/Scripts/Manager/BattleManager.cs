@@ -10,52 +10,119 @@ public class BattleManager : Manager<BattleManager>
 	private UnityEvent<Ship> onShipSelected = new UnityEvent<Ship>();
 	private List<Ship> ships = new List<Ship>();
 
-	private Ship selectedShip = null;
+	private PlayerShip selectedPlayerShip = null;
+	private bool isPlayerTurn = true;
+	private bool canSelectPlayerShips = true;
 
 	protected override void xAwake()
 	{
 		base.xAwake();
-		ships.AddRange(GameObject.FindObjectsOfType<Ship>().ToList());
 	}
 
-	private void Start()
+	private void Update()
 	{
-		SelectShip(null);
+		if (isPlayerTurn && canSelectPlayerShips)
+			SetPlayerShipSelection();
+		else
+			HidePlayerShipsSelection();
 	}
 
-	public void SelectShip(Ship ship)
+#region EnemyTurn
+	public void StartEnemyTurn()
 	{
-		if (selectedShip != null)
-			selectedShip.HideMoveSelection();
-
-		SetShipSelection();
-		selectedShip = ship;
-		onShipSelected.Invoke(ship);
+		StartCoroutine(__EnemyTurnCoroutine());
 	}
 
-	public void SetShipSelection()
+	private IEnumerator __EnemyTurnCoroutine()
 	{
-		Debug.Log("Ship selection");
-		foreach (Ship ship in ships)
+		List<EnemyShip> ships = GetShips<EnemyShip>(ShipOwner.Enemy);
+
+		isPlayerTurn = false;
+		HidePlayerShipsSelection();
+		foreach (EnemyShip ship in ships)
 		{
-			ship.Cell.SetInteractable(true);
-		}
-	}
+			bool shipPlayed = false;
 
+			Debug.Log(ship);
+			ship.Play(() => shipPlayed = true);
+			yield return new WaitUntil(() => shipPlayed);
+		}
+		isPlayerTurn = true;
+	}
+#endregion
+
+#region PlayerTurn
 	public void AddShip(Ship ship)
 	{
 		ships.Add(ship);
 	}
 
+	public void SetPlayerShipSelection()
+	{
+		List<Ship> ships = GetShips(ShipOwner.Player);
+
+		foreach (Ship ship in ships)
+		{
+			ship.IsSelectable = true;
+			ship.Cell.OnSelected = (c) => SelectPlayerShip(ship as PlayerShip);
+		}
+	}
+
+	public void HidePlayerShipsSelection()
+	{
+		List<Ship> ships = GetShips(ShipOwner.Player);
+
+		foreach (Ship ship in ships)
+		{
+			ship.IsSelectable = false;
+			ship.Cell.OnSelected = null;
+		}
+	}
+
+	public void SelectPlayerShip(PlayerShip ship)
+	{
+		UnselectPlayerShip();
+		selectedPlayerShip = ship;
+		selectedPlayerShip.OnSelected();
+		UIManager.instance.SelectShip(selectedPlayerShip);
+	}
+
+	public void UnselectPlayerShip()
+	{
+		if (selectedPlayerShip == null)
+			return;
+		selectedPlayerShip.HideMoveSelection();
+		selectedPlayerShip.OnUnselected();
+		UIManager.instance.SelectShip(null);
+	}
+
+#endregion
+
 #region Getters
+	public List<Ship> GetShips(ShipOwner shipsOwner = ShipOwner.All)
+	{
+		List<Ship> goodOwnerShips = new List<Ship>();
+
+		foreach (Ship ship in ships)
+		{
+			if (shipsOwner.HasFlag(ship.Owner))
+				goodOwnerShips.Add(ship);
+		}
+
+		return (goodOwnerShips);
+	}
+
+	public List<T> GetShips<T>(ShipOwner shipOwner = ShipOwner.All) where T : Ship
+	{
+		List<Ship> ships = GetShips(shipOwner);
+		List<T> typedShips = ships.Select((s) => s as T).ToList();
+
+		return (typedShips);
+	}
+
 	public UnityEvent<Ship> OnShipSelected
 	{
 		get => onShipSelected;
-	}
-
-	public Ship SelectedShip
-	{
-		get => selectedShip;
 	}
 
 	public baseGrid GridMap
@@ -66,6 +133,22 @@ public class BattleManager : Manager<BattleManager>
 				mapManager = GameObject.FindObjectOfType<baseGrid>();
 			return mapManager;
 		}
+	}
+
+	public PlayerShip SelectedPlayerShip
+	{
+		get => selectedPlayerShip;
+	}
+
+	public bool IsPlayerTurn
+	{
+		get => isPlayerTurn;
+	}
+
+	public bool CanSelectPlayerShips
+	{
+		get => canSelectPlayerShips;
+		set => canSelectPlayerShips = value;
 	}
 #endregion
 }

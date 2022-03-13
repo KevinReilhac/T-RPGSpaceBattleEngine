@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using Shapes2D;
 
 public class Cell : MonoBehaviour
@@ -20,7 +21,7 @@ public class Cell : MonoBehaviour
 	private bool isClicked = false;
 	private Vector2Int gridPosition = Vector2Int.zero;
 	private bool isInteractable = false;
-	private UnityEvent onSelected = new UnityEvent();
+	private UnityAction<Cell> onSelected = null;
 	private GridPlacable placedObject = null;
 
 	private void Awake()
@@ -68,9 +69,9 @@ public class Cell : MonoBehaviour
 		get => isInteractable;
 	}
 
-	public UnityEvent OnSelected
+	public UnityAction<Cell> OnSelected
 	{
-		get => onSelected;
+		set => onSelected = value;
 	}
 
 	public GridPlacable PlacedObject
@@ -130,9 +131,11 @@ public class Cell : MonoBehaviour
 #endregion
 
 #region Events
-	private void OnMouseEnter()
+	private void OnMouseOver()
 	{
-		if (isInteractable)
+		if (EventSystem.current.IsPointerOverGameObject())	
+			OnMouseExit();
+		else if (isInteractable)
 			Map.SetHoveredCell(this);
 	}
 
@@ -144,11 +147,11 @@ public class Cell : MonoBehaviour
 
 	private void OnMouseDown()
 	{
-		if (!isInteractable)
+		if (!isInteractable || EventSystem.current.IsPointerOverGameObject())
 			return;
 		isClicked = true;
 		SetClickedColor();
-		onSelected.Invoke();
+		onSelected.Invoke(this);
 	}
 
 	private void OnMouseUp()

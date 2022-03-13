@@ -8,10 +8,11 @@ public class UI_SupportShipPanel : MonoBehaviour
 	[Header("References")]
 	[SerializeField] private Transform content = null;
 	[SerializeField] private List<SO_Ship> shipList = null;
+	[SerializeField] private Transform shipsParent = null;
 	[Header("Prefabs")]
 	[SerializeField] private UI_SupportShipButton buttonPrefab = null;
 	[SerializeField] private UI_DragAndDropShip dragAndDropShipPrefab = null;
-	[SerializeField] private Ship shipPrefab = null;
+	[SerializeField] private PlayerShip shipPrefab = null;
 
 	private void Awake()
 	{
@@ -38,17 +39,17 @@ public class UI_SupportShipPanel : MonoBehaviour
 	{
 		UI_DragAndDropShip dragAndDropShip = Instantiate(dragAndDropShipPrefab);
 
+		BattleManager.instance.CanSelectPlayerShips = false;
+		BattleManager.instance.UnselectPlayerShip();
 		dragAndDropShip.Setup(shipData, OnShipDropped);
-		BattleManager.instance.SelectShip(null);
 	}
 
 	private void OnShipDropped(Cell cell, SO_Ship shipData)
 	{
-		Ship ship = Instantiate(shipPrefab, cell.transform.position, Quaternion.identity);
+		Ship ship = Instantiate(shipPrefab, cell.transform.position, Quaternion.identity, shipsParent);
 
+		BattleManager.instance.CanSelectPlayerShips = true;
 		ship.SetupData(shipData);
-		BattleManager.instance.AddShip(ship);
 		ship.AlignToGrid();
-		BattleManager.instance.SetShipSelection();
 	}
 }

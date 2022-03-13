@@ -171,29 +171,8 @@ public abstract class baseGrid : MonoBehaviour
 		return (null);
 	}
 
-	public abstract List<Cell> GetCellRange(Vector2Int center, int range);
-
-	public List<Cell> GetCellLine(Vector2Int start, Vector2Int end)
-	{
-		List<Cell> cells = new List<Cell>();
-		Vector2 startWorldPosition = worldPosByGridPos[start];
-		Vector2 endWorldPosition = worldPosByGridPos[end];
-		Vector2 direction = (endWorldPosition - startWorldPosition).normalized;
-		float distance = Vector2.Distance(endWorldPosition, startWorldPosition);
-		RaycastHit2D[] hits = null;
-
-		hits = Physics2D.RaycastAll(startWorldPosition, direction, distance);
-
-		foreach (RaycastHit2D hit in hits)
-		{
-			Cell cell = hit.collider.gameObject.GetComponent<Cell>();
-
-			if (cell != null)
-				cells.Add(cell);
-		}
-
-		return (cells);
-	}
+	abstract public List<Cell> GetCellRange(Vector2Int center, int range, bool getFullCells = true);
+	abstract public List<Cell> GetCellLine(Vector2Int start, Vector2Int end, bool blocking = true);
 
 	public Vector3 GetWorldPosition(Vector2Int gridPosition)
 	{
@@ -205,7 +184,7 @@ public abstract class baseGrid : MonoBehaviour
 		return (GetCell(new Vector2Int(x, y)));
 	}
 
-	public Cell GetNearestCell(Vector2 position)
+	public Cell GetNearestCell(Vector2 position, bool getFullCells = true)
 	{
 		List<Vector2> cellsWorldPos = worldPosByGridPos.Values.ToList();
 
@@ -215,6 +194,9 @@ public abstract class baseGrid : MonoBehaviour
 		for (int i = 0; i < cellsWorldPos.Count; i++)
 		{
 			float dist = Vector2.Distance(position, cellsWorldPos[i]);
+
+			if (getFullCells == false && mapMatrix.Values.ElementAt(i).PlacedObject != null)
+				continue;
 
 			if (dist < nearestDist)
 			{

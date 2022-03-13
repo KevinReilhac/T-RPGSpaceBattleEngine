@@ -30,7 +30,7 @@ public class UI_DragAndDropShip : MonoBehaviour
 	private void UpdatePosition()
 	{
 		Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		currentCell = BattleManager.instance.GridMap.GetNearestCell(mouseWorldPos);
+		currentCell = BattleManager.instance.GridMap.GetNearestCell(mouseWorldPos, false);
 
 		transform.position = currentCell.transform.position;
 	}

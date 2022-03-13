@@ -23,4 +23,4 @@ MonoBehaviour:
   attacks:
   - {fileID: 11400000, guid: ae100a687476846469f64265866822c6, type: 2}
   - {fileID: 11400000, guid: ee2d0c1e7097a48439ecf1349683aa50, type: 2}
-  sprite: {fileID: 21300000, guid: b22f842293ba68c4386b0326a05dc4bb, type: 3}
+  sprite: {fileID: 21300000, guid: ad1aed64d1ddb2042b814ca2701b6fce, type: 3}

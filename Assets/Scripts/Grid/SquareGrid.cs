@@ -17,8 +17,15 @@ public class SquareGrid : baseGrid
 		return new Vector2(x * cellSize, y * cellSize);
 	}
 
-	public override List<Cell> GetCellRange(Vector2Int center, int range)
+	public override List<Cell> GetCellRange(Vector2Int center, int range, bool getFullCells = true)
 	{
+		//TODO
+		return (null);
+	}
+
+	public override List<Cell> GetCellLine(Vector2Int p1, Vector2Int p2, bool isBlocking = false)
+	{
+		//TODO
 		return (null);
 	}
 }

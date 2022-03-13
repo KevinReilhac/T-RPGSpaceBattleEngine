@@ -38,7 +38,7 @@ public class HexGrid : baseGrid
 		}
 	}
 
-	public override List<Cell> GetCellRange(Vector2Int center, int range)
+	public override List<Cell> GetCellRange(Vector2Int center, int range, bool getFullCells = true)
 	{
 		List<Cell> cells = new List<Cell>();
 
@@ -49,7 +49,34 @@ public class HexGrid : baseGrid
 			foreach (HexOffsetCoordinates coord in offsetCoords)
 			{
 				if (mapMatrix.ContainsKey(coord.ToVector2Int()))
-					cells.Add(mapMatrix[coord.ToVector2Int()]);
+				{
+					Cell cell = mapMatrix[coord.ToVector2Int()];
+
+					if (!getFullCells && cell.PlacedObject != null)
+						continue;
+
+					cells.Add(cell);
+				}
+			}
+		}
+
+		return (cells);
+	}
+
+	public override List<Cell> GetCellLine(Vector2Int p1, Vector2Int p2, bool blocking = false)
+	{
+		List<Cell> cells = new List<Cell>();
+		HexOffsetCoordinates[] line = HexLib.GetLine(p1.ToHexOffsetCoords(), p2.ToHexOffsetCoords());
+
+		foreach (HexOffsetCoordinates coord in line)
+		{
+			if (mapMatrix.ContainsKey(coord.ToVector2Int()))
+			{
+				Cell cell = mapMatrix[coord.ToVector2Int()];
+
+				cells.Add(cell);
+				if (blocking && cell.PlacedObject != null)
+					break;
 			}
 		}
 

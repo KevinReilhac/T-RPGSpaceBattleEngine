@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : Manager<UIManager>
 {
 	[SerializeField] private UI_ShipDetailsPanel shipDetailsPanel = null;
 	[SerializeField] private UI_ActionsPanel actionsPanel = null;
+	[SerializeField] private UI_SupportShipPanel supportPanel = null;
+	[SerializeField] private Button endTurnButton = null;
 	[SerializeField] private Canvas canvas = null;
 
 	private Ship selectedShip = null;
@@ -16,6 +19,13 @@ public class UIManager : Manager<UIManager>
 
 		SelectShip(null);
 		BattleManager.instance.OnShipSelected.AddListener(SelectShip);
+		endTurnButton.onClick.AddListener(BattleManager.instance.StartEnemyTurn);
+	}
+
+	private void Update()
+	{
+		endTurnButton.gameObject.SetActive(BattleManager.instance.IsPlayerTurn);
+		supportPanel.gameObject.SetActive(BattleManager.instance.IsPlayerTurn);
 	}
 
 	public void SelectShip(Ship ship)

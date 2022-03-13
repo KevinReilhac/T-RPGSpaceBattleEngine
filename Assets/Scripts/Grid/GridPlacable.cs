@@ -12,9 +12,10 @@ public class GridPlacable : MonoBehaviour
 		AlignToGrid();
 	}
 
-	virtual protected void OnCellSelected()
+	public bool IsSelectable
 	{
-		//Empty implementation
+		get => cell.IsInteractable;
+		set => cell.SetInteractable(value);
 	}
 
 	[Button]
@@ -29,11 +30,9 @@ public class GridPlacable : MonoBehaviour
 		if (this.cell != null)
 		{
 			this.cell.PlacedObject = null;
-			this.cell.OnSelected.RemoveListener(OnCellSelected);
 		}
 		this.cell = cell;
 		cell.PlacedObject = this;
-		cell.OnSelected.AddListener(OnCellSelected);
 	}
 
 	public Vector2Int GridPosition
