@@ -31,6 +31,57 @@ public class PlayerShip : Ship
 			BattleManager.instance.UnselectPlayerShip();
 	}
 
+	private void EndAction()
+	{
+		currentActionPoints--;
+		BattleManager.instance.UnselectPlayerShip();
+	}
+
+	public void HideAllSelections()
+	{
+		HideMoveSelection();
+		HideAttackSelection();
+	}
+
+#region Attack
+ 	public void DrawAttackSelection(SO_Attack attack)
+	{
+		if (currentActionPoints <= 0)
+			return;
+
+		List<Cell> cells = BattleManager.instance.GetShips(ShipOwner.Enemy)
+			.Select((s) => s.Cell)
+			.ToList();
+		
+		foreach (Cell cell in cells)
+		{
+			cell.SetInteractable(true);
+			cell.SetInsideColor(Color.red);
+			cell.OnSelected = (c) => {
+				Ship target = (Ship)c.PlacedObject;
+
+				Attack(attack, target);
+				EndAction();
+			};
+		}
+	}
+
+	private void HideAttackSelection()
+	{
+		List<Cell> cells = BattleManager.instance.GetShips(ShipOwner.Enemy)
+			.Select((s) => s.Cell)
+			.ToList();
+		
+		foreach (Cell cell in cells)
+		{
+			cell.SetInteractable(true);
+			cell.ResetInsideColor();
+			cell.OnSelected = null;
+		}
+	}
+#endregion
+
+#region Move
 	public void DrawMoveSelection()
 	{
 		List<Cell> movableCells = GetMoveRangeCells();
@@ -59,10 +110,11 @@ public class PlayerShip : Ship
 	{
 		if (targetCell == this.cell)
 			return;
-		currentActionPoints--;
+		EndAction();
 		BattleManager.instance.GridMap.ResetAllCells();
-		MoveTo(targetCell.GridPosition, BattleManager.instance.UnselectPlayerShip);
+		MoveTo(targetCell.GridPosition);
 	}
+#endregion
 
-	public override ShipOwner Owner => ShipOwner.Player;
+public override ShipOwner Owner => ShipOwner.Player;
 }

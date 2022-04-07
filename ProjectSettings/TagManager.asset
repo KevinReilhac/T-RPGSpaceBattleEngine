@@ -44,6 +44,9 @@ TagManager:
   - name: Grid
     uniqueID: 2867260099
     locked: 0
+  - name: Projectiles
+    uniqueID: 1441502625
+    locked: 0
   - name: Objects
     uniqueID: 217072205
     locked: 0

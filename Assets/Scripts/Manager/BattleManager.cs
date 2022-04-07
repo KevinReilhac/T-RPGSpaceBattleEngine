@@ -7,7 +7,7 @@ using UnityEngine.Events;
 public class BattleManager : Manager<BattleManager>
 {
 	private baseGrid mapManager = null;
-	private UnityEvent<Ship> onShipSelected = new UnityEvent<Ship>();
+	private UnityEvent<PlayerShip> onShipSelected = new UnityEvent<PlayerShip>();
 	private List<Ship> ships = new List<Ship>();
 
 	private PlayerShip selectedPlayerShip = null;
@@ -91,7 +91,7 @@ public class BattleManager : Manager<BattleManager>
 	{
 		if (selectedPlayerShip == null)
 			return;
-		selectedPlayerShip.HideMoveSelection();
+		selectedPlayerShip.HideAllSelections();
 		selectedPlayerShip.OnUnselected();
 		UIManager.instance.SelectShip(null);
 	}
@@ -120,7 +120,7 @@ public class BattleManager : Manager<BattleManager>
 		return (typedShips);
 	}
 
-	public UnityEvent<Ship> OnShipSelected
+	public UnityEvent<PlayerShip> OnShipSelected
 	{
 		get => onShipSelected;
 	}

@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: ShipEnemy_Test
   m_EditorClassIdentifier: 
   price: 1000
-  health: 100
+  health: 500
   actionPoints: 2
   speed: 3
-  evade: 20
-  armor: 20
+  evade: 10
+  armor: 5
   flac: 0
-  type: 0
+  type: 4
+  sprite: {fileID: 21300000, guid: 2ae616bf08dfe1545bbbe55a124a29a8, type: 3}
   attacks: []
-  sprite: {fileID: 0}

@@ -151,7 +151,8 @@ public class Cell : MonoBehaviour
 			return;
 		isClicked = true;
 		SetClickedColor();
-		onSelected.Invoke(this);
+		if (onSelected != null)
+			onSelected.Invoke(this);
 	}
 
 	private void OnMouseUp()

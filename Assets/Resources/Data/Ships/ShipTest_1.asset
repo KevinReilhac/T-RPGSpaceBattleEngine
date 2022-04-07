@@ -19,8 +19,8 @@ MonoBehaviour:
   evade: 20
   armor: 20
   flac: 0
-  type: 0
+  type: 4
+  sprite: {fileID: 21300000, guid: ad1aed64d1ddb2042b814ca2701b6fce, type: 3}
   attacks:
   - {fileID: 11400000, guid: ae100a687476846469f64265866822c6, type: 2}
   - {fileID: 11400000, guid: ee2d0c1e7097a48439ecf1349683aa50, type: 2}
-  sprite: {fileID: 21300000, guid: ad1aed64d1ddb2042b814ca2701b6fce, type: 3}

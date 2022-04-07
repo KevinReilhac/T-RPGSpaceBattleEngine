@@ -11,7 +11,7 @@ public class UIManager : Manager<UIManager>
 	[SerializeField] private Button endTurnButton = null;
 	[SerializeField] private Canvas canvas = null;
 
-	private Ship selectedShip = null;
+	private PlayerShip selectedPlayerShip = null;
 
 	protected override void xAwake()
 	{
@@ -28,11 +28,11 @@ public class UIManager : Manager<UIManager>
 		supportPanel.gameObject.SetActive(BattleManager.instance.IsPlayerTurn);
 	}
 
-	public void SelectShip(Ship ship)
+	public void SelectShip(PlayerShip ship)
 	{
 		shipDetailsPanel.SetShip(ship);
 		actionsPanel.Setup(ship);
-		selectedShip = ship;
+		selectedPlayerShip = ship;
 	}
 
 	public Canvas Canvas
@@ -40,9 +40,9 @@ public class UIManager : Manager<UIManager>
 		get => canvas;
 	}
 
-	public Ship SelectedShip
+	public PlayerShip SelectedShip
 	{
-		get => selectedShip;
+		get => selectedPlayerShip;
 	}
 
 	private void OnDestroy()

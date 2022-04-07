@@ -6,6 +6,7 @@ using UnityEngine.Events;
 using NaughtyAttributes;
 using Shapes2D;
 
+[ExecuteAlways]
 public abstract class baseGrid : MonoBehaviour
 {
 	private const string CELLS_PARENT_NAME = "Cells";

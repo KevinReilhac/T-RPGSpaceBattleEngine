@@ -12,8 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 566d5d6ec5bfb414ca11f97ae0b9a101, type: 3}
   m_Name: Laser
   m_EditorClassIdentifier: 
-  attackName: Laser
-  damages: {x: 10, y: 30}
-  precision: 10
-  ignoreShield: 0
   sprite: {fileID: 21300000, guid: a5c311b1f21e45e4ca0f386a2442248e, type: 3}
+  attackName: Laser
+  precision: 100
+  damages:
+    min: 10
+    max: 30
+  normalDistanceRange:
+    min: 2
+    max: 5
+  ignoreEvade: 1
+  ignoreFlac: 0
+  ignoreArmor: 0
+  attackVisual: {fileID: 1698029812, guid: f5a038ffddad5614aab11827eeb793db, type: 3}

@@ -22,11 +22,17 @@ public class GridPlacable : MonoBehaviour
 	public void AlignToGrid()
 	{
 		SetCell(BattleManager.instance.GridMap.GetNearestCell(transform.position));
-		transform.position = cell.transform.position;
+		if (cell != null)
+			transform.position = cell.transform.position;
 	}
 
 	protected void SetCell(Cell cell)
 	{
+		if (cell == null)
+		{
+			Debug.LogError("Cell is null");
+			return;
+		}
 		if (this.cell != null)
 		{
 			this.cell.PlacedObject = null;

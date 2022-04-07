@@ -9,4 +9,9 @@ public static class Vector2IntExtention
 	{
 		return (new HexOffsetCoordinates(vector.x, vector.y));
 	}
+
+	public static int GetRandomRange(this Vector2Int vector)
+	{
+		return (Random.Range(vector.x, vector.y));
+	}
 }
