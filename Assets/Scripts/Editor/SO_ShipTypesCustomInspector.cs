@@ -8,7 +8,6 @@ using UnityEditor;
 public class SO_ShipTypesCustomInspector : Editor
 {
 	private SO_ShipTypes shipTypes = null;
-	private static bool drawDefaultUI = true;
 
 	private void OnEnable()
 	{
@@ -27,26 +26,11 @@ public class SO_ShipTypesCustomInspector : Editor
 		DrawTypesList();
 		EditorGUILayout.Space();
 		DrawDamagesFromType();
-
-		drawDefaultUI = EditorGUILayout.Foldout(drawDefaultUI, "Default UI");
-
-		if (drawDefaultUI)
-			base.OnInspectorGUI();
-	}
-
-	private void Test()
-	{
-		for (int x = 0; x < shipTypes.types.Count; x++)
-		{
-			for (int y = 0; x < shipTypes.types.Count; y++)
-			{
-				Debug.LogFormat("{0}-->{1}------>{2}", shipTypes.types[x], shipTypes.types[y], shipTypes.GetDamageMultiplicator(x, y));
-			}
-		}
 	}
 
 	private void DrawTypesList()
 	{
+		EditorGUILayout.LabelField("Types");
 		for (int i = 0; i < shipTypes.types.Count; i++)
 		{
 			EditorGUILayout.BeginHorizontal();
@@ -68,6 +52,7 @@ public class SO_ShipTypesCustomInspector : Editor
 
 	private void DrawDamagesFromType()
 	{
+		EditorGUILayout.LabelField("Damages multipliers");
 		if (shipTypes.damagesFromTypes.Count <= 0)
 			return;
 

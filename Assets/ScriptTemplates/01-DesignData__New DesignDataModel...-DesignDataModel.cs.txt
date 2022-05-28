@@ -1,0 +1,10 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Kebab.DesignData;
+
+[CreateAssetMenu(fileName = "#SCRIPTNAME#", menuName = "DesignData/#SCRIPTNAME#", order = 20)] 
+public class #SCRIPTNAME# : baseDesignData
+{
+#NOTRIM#
+}

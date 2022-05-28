@@ -2,8 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NaughtyAttributes;
-
-
+using Kebab.DesignData;
 
 [CreateAssetMenu(menuName = "Data/Ship", fileName = "Ship")]
 public class SO_Ship : ScriptableObject

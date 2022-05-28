@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Array2DEditor;
+using Kebab.DesignData;
 
 [CreateAssetMenu(fileName = "ShipTypes", menuName = "DesignData/ShipTypes")]
 public class SO_ShipTypes : baseDesignData
