@@ -3,106 +3,119 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEditorInternal;
 
-[CustomEditor(typeof(SO_ShipTypes))]
-public class SO_ShipTypesCustomInspector : Editor
+namespace Kebab.BattleEngine.Ships.EditorTools
 {
-	private SO_ShipTypes shipTypes = null;
-
-	private void OnEnable()
+	[CustomEditor(typeof(ShipTypesDesignData))]
+	public class ShipTypesDesignDataCustomInspector : Editor
 	{
-		shipTypes = (SO_ShipTypes)target;
+		private ShipTypesDesignData shipTypes = null;
+		private ReorderableList typeReorderableList = null;
+		private SerializedProperty typeListProperty = null;
 
-		if (shipTypes.damagesFromTypes == null)
-			shipTypes.damagesFromTypes = new List<SO_ShipTypes.DamageMultiplicatorByType>();
-		if (shipTypes.types == null)
-			shipTypes.types = new List<string>();
-		UpdateDamageTypeDict();
-	}
-
-	public override void OnInspectorGUI()
-	{
-
-		DrawTypesList();
-		EditorGUILayout.Space();
-		DrawDamagesFromType();
-	}
-
-	private void DrawTypesList()
-	{
-		EditorGUILayout.LabelField("Types");
-		for (int i = 0; i < shipTypes.types.Count; i++)
+		private void OnEnable()
 		{
-			EditorGUILayout.BeginHorizontal();
-			shipTypes.types[i] = EditorGUILayout.TextField(shipTypes.types[i]);
-			if (GUILayout.Button("Remove", GUILayout.Width(100f)))
-			{
-				shipTypes.types.RemoveAt(i);
-				UpdateDamageTypeDict();
-			}
-			EditorGUILayout.EndHorizontal();
+			shipTypes = (ShipTypesDesignData)target;
+
+			if (shipTypes.damagesFromTypes == null)
+				shipTypes.damagesFromTypes = new List<ShipTypesDesignData.DamageMultiplicatorByType>();
+
+			//List
+			typeListProperty = serializedObject.FindProperty("types");
+			typeReorderableList = new ReorderableList(serializedObject, typeListProperty, true, true, true, true);
+			typeReorderableList.drawElementCallback += DrawListItems;
+			typeReorderableList.drawHeaderCallback += DrawHeader;
+			typeReorderableList.onChangedCallback += (_) => UpdateDamageTypeDict();
 		}
 
-		if (GUILayout.Button("Add Type"))
+		public override void OnInspectorGUI()
 		{
-			shipTypes.types.Add("Type " + (shipTypes.types.Count + 1).ToString());
-			UpdateDamageTypeDict();
+			typeReorderableList.DoLayoutList();
+			EditorGUILayout.Space();
+			DrawDamagesFromType();
+
+			serializedObject.ApplyModifiedProperties();
 		}
-	}
 
-	private void DrawDamagesFromType()
-	{
-		EditorGUILayout.LabelField("Damages multipliers");
-		if (shipTypes.damagesFromTypes.Count <= 0)
-			return;
-
-		EditorGUILayout.BeginHorizontal();
-		GUI.enabled = false;
-		EditorGUILayout.TextField("From / To");
-		for (int i = 0; i < shipTypes.types.Count; i++)
-			EditorGUILayout.TextField(shipTypes.types[i]);
-		GUI.enabled = true;
-		EditorGUILayout.EndHorizontal();
-		for (int x = 0; x < shipTypes.types.Count; x++)
+		// Draws the elements on the list
+		void DrawListItems(Rect rect, int index, bool isActive, bool isFocused)
 		{
+			SerializedProperty element = typeReorderableList.serializedProperty.GetArrayElementAtIndex(index); // The element in the list
+
+			//Create a property field and label field for each property. 
+
+			//The 'mobs' property. Since the enum is self-evident, I am not making a label field for it. 
+			//The property field for mobs (width 100, height of a single line)
+			EditorGUI.PropertyField(
+				new Rect(rect.x, rect.y, 200f, EditorGUIUtility.singleLineHeight),
+				element,
+				GUIContent.none
+			);
+		}
+
+		//Draws the header
+		void DrawHeader(Rect rect)
+		{
+			string name = "Ship types";
+			EditorGUI.LabelField(rect, name);
+		}
+
+		private void DrawDamagesFromType()
+		{
+			EditorGUILayout.LabelField("Damages multipliers");
+			if (shipTypes.damagesFromTypes.Count <= 0)
+				return;
+
 			EditorGUILayout.BeginHorizontal();
 			GUI.enabled = false;
-			EditorGUILayout.TextField(shipTypes.types[x]);
+			EditorGUILayout.TextField("From / To");
+			for (int i = 0; i < shipTypes.types.Count; i++)
+				EditorGUILayout.TextField(shipTypes.types[i]);
 			GUI.enabled = true;
-
-			for (int y = 0; y < shipTypes.types.Count; y++)
-			{
-				EditorGUILayout.BeginVertical();
-				shipTypes.damagesFromTypes[x].damagesFromType[y] = EditorGUILayout.FloatField(shipTypes.damagesFromTypes[x].damagesFromType[y]);
-				EditorGUILayout.EndVertical();
-			}
 			EditorGUILayout.EndHorizontal();
+			for (int x = 0; x < shipTypes.types.Count; x++)
+			{
+				EditorGUILayout.BeginHorizontal();
+				GUI.enabled = false;
+				EditorGUILayout.TextField(shipTypes.types[x]);
+				GUI.enabled = true;
+
+				for (int y = 0; y < shipTypes.types.Count; y++)
+				{
+					EditorGUILayout.BeginVertical();
+					shipTypes.damagesFromTypes[x].damagesFromType[y] = EditorGUILayout.FloatField(shipTypes.damagesFromTypes[x].damagesFromType[y]);
+					EditorGUILayout.EndVertical();
+				}
+				EditorGUILayout.EndHorizontal();
+			}
 		}
-	}
 
-	private void UpdateDamageTypeDict()
-	{
-		while (shipTypes.damagesFromTypes.Count < shipTypes.types.Count)
-			shipTypes.damagesFromTypes.Add(new SO_ShipTypes.DamageMultiplicatorByType(shipTypes.damagesFromTypes.Count, shipTypes.types.Count));
-
-		foreach (SO_ShipTypes.DamageMultiplicatorByType item in shipTypes.damagesFromTypes)
+		private void UpdateDamageTypeDict()
 		{
-			while (item.damagesFromType.Count < shipTypes.types.Count)
-				item.damagesFromType.Add(1f);
+			serializedObject.ApplyModifiedProperties();
+			while (shipTypes.damagesFromTypes.Count < shipTypes.types.Count)
+				shipTypes.damagesFromTypes.Add(new ShipTypesDesignData.DamageMultiplicatorByType(shipTypes.damagesFromTypes.Count, shipTypes.types.Count));
+
+			foreach (ShipTypesDesignData.DamageMultiplicatorByType item in shipTypes.damagesFromTypes)
+			{
+				while (item.damagesFromType.Count < shipTypes.types.Count)
+					item.damagesFromType.Add(1f);
+			}
 		}
-	}
 
-	private List<(int, int)> GetTypesCombination()
-	{
-		List<int> types = Enumerable.Range(0, shipTypes.types.Count).ToList();
+		private List<(int, int)> GetTypesCombination()
+		{
+			List<int> types = Enumerable.Range(0, shipTypes.types.Count).ToList();
 
-		return (GetPermutationsWithRept<int>(types, 2).Select(c => (c[0], c[1])).ToList());
-	}
+			return (GetPermutationsWithRept<int>(types, 2).Select(c => (c[0], c[1])).ToList());
+		}
 
-	private List<List<T>> GetPermutationsWithRept<T>(List<T> list, int length)
-	{
-		if (length == 1)
-			return list.Select(t => new List<T> { t }).ToList();
-		return GetPermutationsWithRept(list, length - 1).SelectMany(t => list, (t1, t2) => t1.Concat(new T[] { t2 }).ToList()).ToList();
+		private List<List<T>> GetPermutationsWithRept<T>(List<T> list, int length)
+		{
+			if (length == 1)
+				return list.Select(t => new List<T> { t }).ToList();
+			return GetPermutationsWithRept(list, length - 1).SelectMany(t => list, (t1, t2) => t1.Concat(new T[] { t2 }).ToList()).ToList();
+		}
 	}
 }

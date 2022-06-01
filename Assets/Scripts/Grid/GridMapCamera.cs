@@ -2,83 +2,87 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NaughtyAttributes;
+using Kebab.BattleEngine.Extentions;
 
-public class GridMapCamera : MonoBehaviour
+namespace Kebab.BattleEngine.Map
 {
-	[Header("References")]
-	[SerializeField] private Camera cameraComponent = null;
-	[Header("Options")]
-	[SerializeField] private float cameraSizeMin = 0.3f;
-	[SerializeField] private float zoomSpeed = 0.5f;
-
-	private float cameraSizeMax = 0f;
-	private Vector3 mouseOrigin;
-	private Vector3 mouseDifference;
-	private bool isDrag = false;
-	private baseGrid gridMap = null;
-
-	private Bounds cameraMoveBounds;
-
-	private void Start()
+	public class GridMapCamera : MonoBehaviour
 	{
-		gridMap = BattleManager.instance.GridMap;
-		cameraSizeMax = gridMap.Bounds.extents.y;
-		UpdateCameraMoveBounds();
-	}
+		[Header("References")]
+		[SerializeField] private Camera cameraComponent = null;
+		[Header("Options")]
+		[SerializeField] private float cameraSizeMin = 0.3f;
+		[SerializeField] private float zoomSpeed = 0.5f;
 
-	private void LateUpdate()
-	{
-		UpdateDrag();
-		UpdateZoom();
-	}
+		private float cameraSizeMax = 0f;
+		private Vector3 mouseOrigin;
+		private Vector3 mouseDifference;
+		private bool isDrag = false;
+		private baseGrid gridMap = null;
 
-	private void UpdateZoom()
-	{
-		cameraComponent.orthographicSize += Input.mouseScrollDelta.y * Time.deltaTime * zoomSpeed;
-		cameraComponent.orthographicSize = Mathf.Clamp(cameraComponent.orthographicSize, cameraSizeMin, cameraSizeMax);
-		UpdateCameraMoveBounds();
-		SetCameraInMoveBounds();
-	}
+		private Bounds cameraMoveBounds;
 
-	private void SetCameraInMoveBounds()
-	{
-		transform.position = cameraMoveBounds.ClosestPoint(transform.position);
-	}
-
-	private void UpdateDrag()
-	{
-		if (Input.GetMouseButton(1))
+		private void Start()
 		{
-			mouseDifference = (Camera.main.ScreenToWorldPoint(Input.mousePosition)) - Camera.main.transform.position;
-			if (isDrag == false)
-			{
-				isDrag = true;
-				mouseOrigin = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			}
+			gridMap = BattleManager.instance.GridMap;
+			cameraSizeMax = gridMap.Bounds.extents.y;
+			UpdateCameraMoveBounds();
 		}
-		else
+
+		private void LateUpdate()
 		{
-			isDrag = false;
+			UpdateDrag();
+			UpdateZoom();
 		}
-		if (isDrag == true)
+
+		private void UpdateZoom()
 		{
-			transform.position = mouseOrigin - mouseDifference;
+			cameraComponent.orthographicSize += Input.mouseScrollDelta.y * Time.deltaTime * zoomSpeed;
+			cameraComponent.orthographicSize = Mathf.Clamp(cameraComponent.orthographicSize, cameraSizeMin, cameraSizeMax);
+			UpdateCameraMoveBounds();
 			SetCameraInMoveBounds();
 		}
-	}
 
-	private void UpdateCameraMoveBounds()
-	{
-		cameraMoveBounds = new Bounds(
-			gridMap.Bounds.center,
-			gridMap.Bounds.size - cameraComponent.OrthographicBounds().size
-		);
-	}
+		private void SetCameraInMoveBounds()
+		{
+			transform.position = cameraMoveBounds.ClosestPoint(transform.position);
+		}
 
-	private void OnDrawGizmosSelected()
-	{
-		Gizmos.color = Color.blue;
+		private void UpdateDrag()
+		{
+			if (Input.GetMouseButton(1))
+			{
+				mouseDifference = (Camera.main.ScreenToWorldPoint(Input.mousePosition)) - Camera.main.transform.position;
+				if (isDrag == false)
+				{
+					isDrag = true;
+					mouseOrigin = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+				}
+			}
+			else
+			{
+				isDrag = false;
+			}
+			if (isDrag == true)
+			{
+				transform.position = mouseOrigin - mouseDifference;
+				SetCameraInMoveBounds();
+			}
+		}
 
-		Gizmos.DrawWireCube(cameraMoveBounds.center, cameraMoveBounds.size);
+		private void UpdateCameraMoveBounds()
+		{
+			cameraMoveBounds = new Bounds(
+				gridMap.Bounds.center,
+				gridMap.Bounds.size - cameraComponent.OrthographicBounds().size
+			);
+		}
+
+		private void OnDrawGizmosSelected()
+		{
+			Gizmos.color = Color.blue;
+
+			Gizmos.DrawWireCube(cameraMoveBounds.center, cameraMoveBounds.size);
+		}
 	}
 }

@@ -4,33 +4,39 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Button))]
-public class UI_ActionsPanelButton : MonoBehaviour
+using Kebab.BattleEngine.Ships;
+using Kebab.BattleEngine.Attacks;
+
+namespace Kebab.BattleEngine.UI
 {
-	[SerializeField] private Image image = null;
-	[SerializeField] private Button button = null;
-
-	private UnityEvent<SO_Attack> onSelected = new UnityEvent<SO_Attack>();
-	private SO_Attack attackData = null;
-
-	private void Awake()
+	[RequireComponent(typeof(Button))]
+	public class UI_ActionsPanelButton : MonoBehaviour
 	{
-		button.onClick.AddListener(() => OnSelected.Invoke(attackData));
-	}
+		[SerializeField] private Image image = null;
+		[SerializeField] private Button button = null;
 
-	public void Setup(SO_Attack attackData)
-	{
-		image.sprite = attackData.sprite;
-		this.attackData = attackData;
-	}
+		private UnityEvent<SO_Attack> onSelected = new UnityEvent<SO_Attack>();
+		private SO_Attack attackData = null;
 
-	public void SetInteractable(bool isInteractable)
-	{
-		button.interactable = isInteractable;
-	}
+		private void Awake()
+		{
+			button.onClick.AddListener(() => OnSelected.Invoke(attackData));
+		}
 
-	public UnityEvent<SO_Attack> OnSelected
-	{
-		get => onSelected;
+		public void Setup(SO_Attack attackData)
+		{
+			image.sprite = attackData.sprite;
+			this.attackData = attackData;
+		}
+
+		public void SetInteractable(bool isInteractable)
+		{
+			button.interactable = isInteractable;
+		}
+
+		public UnityEvent<SO_Attack> OnSelected
+		{
+			get => onSelected;
+		}
 	}
 }

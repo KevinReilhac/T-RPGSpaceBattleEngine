@@ -1,35 +1,79 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Kebab.BattleEngine.Difficulty;
+using Kebab.BattleEngine.Map;
+using Kebab.Extentions.ListExtention;
 
-public class EnemyShip : Ship
+using Kebab.BattleEngine.Ships.AI;
+namespace Kebab.BattleEngine.Ships
 {
-	public override ShipOwner Owner => ShipOwner.Enemy;
-
-	UnityAction onEndPlay = null;
-
-	public void Play(UnityAction onEndPlay)
+	public class EnemyShip : Ship
 	{
-		this.onEndPlay = onEndPlay;
-		StartCoroutine(__PlayCoroutine());
-	}
+		[SerializeField] private ShipAIType aiType;
 
-	private IEnumerator __PlayCoroutine()
-	{
-		for (int i = 0; i < MaxActionPoints; i++)
+		private baseShipAI ai = null;
+
+		public override ShipOwner Owner => ShipOwner.Enemy;
+
+		UnityAction onEndPlay = null;
+
+		protected override void Awake()
 		{
-			bool moved = false;
-			Move(() => moved = true);
-			yield return new WaitUntil(() => moved);
+			base.Awake();
+			SetupAI();
+			ai.SetupShip(this);
 		}
-		onEndPlay.Invoke();
-	}
 
-	private void Move(UnityAction action)
-	{
-		List<Cell> moveCells = GetMoveRangeCells();
+		private void SetupAI()
+		{
+			if (aiType.GetType(out Type type))
+			{
+				ai = gameObject.AddComponent(type) as baseShipAI;
+				ai.SetupShip(this);
+			}
+			else
+			{
+				Debug.LogErrorFormat("{0} AI not found", aiType.typeName);
+			}
+		}
 
-		MoveTo(moveCells.GetRandom().GridPosition, action);
+		public void Play(UnityAction onEndPlay)
+		{
+			if (ai == null)
+			{
+				Debug.LogError("AI not set");
+				onEndPlay.Invoke();
+				return;
+			}
+
+			this.onEndPlay = onEndPlay;
+			StartCoroutine(__PlayCoroutine());
+		}
+
+		public override int MaxHealth
+		{
+			get => Mathf.RoundToInt(shipData.health * DifficultyManager.instance.CurrentDifficulty.enemyLifeMultiplicator);
+		}
+
+		private IEnumerator __PlayCoroutine()
+		{
+			for (int i = 0; i < MaxActionPoints; i++)
+			{
+				bool waitCondition = false;
+				ai.Play(() => waitCondition = true);
+				yield return new WaitUntil(() => waitCondition);
+			}
+			onEndPlay.Invoke();
+		}
+
+		private void Move(UnityAction action)
+		{
+			List<Cell> moveCells = GetMoveRangeCells();
+
+			MoveTo(moveCells.GetRandom().GridPosition, action);
+		}
 	}
 }

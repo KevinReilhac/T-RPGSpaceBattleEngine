@@ -21,7 +21,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "91f08891d01d42e00f06f557d3779d0430dad5f9"
+      "hash": "a1fa5e7901ee31ae437bb14de6ccc2017c77429c"
     },
     "com.kebab.package_manager": {
       "version": "git@github.com:KevinReilhac/KebabPackageManager.git",

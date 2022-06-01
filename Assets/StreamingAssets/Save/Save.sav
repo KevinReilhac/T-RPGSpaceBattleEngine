@@ -1,0 +1,45 @@
+{
+    "ships": [
+        {
+            "shipData": {
+                "instanceID": 28120
+            },
+            "currentHp": 400,
+            "currentActionPoints": 2,
+            "ennemyShip": true,
+            "gridPosition": {
+                "x": 13,
+                "y": 8
+            }
+        },
+        {
+            "shipData": {
+                "instanceID": 28120
+            },
+            "currentHp": 400,
+            "currentActionPoints": 2,
+            "ennemyShip": true,
+            "gridPosition": {
+                "x": 13,
+                "y": 5
+            }
+        },
+        {
+            "shipData": {
+                "instanceID": 28120
+            },
+            "currentHp": 400,
+            "currentActionPoints": 2,
+            "ennemyShip": true,
+            "gridPosition": {
+                "x": 11,
+                "y": 6
+            }
+        }
+    ],
+    "gridSize": {
+        "x": 30,
+        "y": 15
+    },
+    "gridType": 0
+}

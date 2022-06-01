@@ -3,51 +3,54 @@ using System.Collections.Generic;
 using UnityEngine;
 using NaughtyAttributes;
 
-public class GridPlacable : MonoBehaviour
+namespace Kebab.BattleEngine.Map
 {
-	protected Cell cell = null;
-
-	private void Start()
+	public class GridPlacable : MonoBehaviour
 	{
-		AlignToGrid();
-	}
+		protected Cell cell = null;
 
-	public bool IsSelectable
-	{
-		get => cell.IsInteractable;
-		set => cell.SetInteractable(value);
-	}
-
-	[Button]
-	public void AlignToGrid()
-	{
-		SetCell(BattleManager.instance.GridMap.GetNearestCell(transform.position));
-		if (cell != null)
-			transform.position = cell.transform.position;
-	}
-
-	protected void SetCell(Cell cell)
-	{
-		if (cell == null)
+		private void Start()
 		{
-			Debug.LogError("Cell is null");
-			return;
+			AlignToGrid();
 		}
-		if (this.cell != null)
+
+		public bool IsSelectable
 		{
-			this.cell.PlacedObject = null;
+			get => cell.IsInteractable;
+			set => cell.SetInteractable(value);
 		}
-		this.cell = cell;
-		cell.PlacedObject = this;
-	}
 
-	public Vector2Int GridPosition
-	{
-		get => cell.GridPosition;
-	}
+		[Button]
+		public void AlignToGrid()
+		{
+			SetCell(BattleManager.instance.GridMap.GetNearestCell(transform.position));
+			if (cell != null)
+				transform.position = cell.transform.position;
+		}
 
-	public Cell Cell
-	{
-		get => cell;
+		protected void SetCell(Cell cell)
+		{
+			if (cell == null)
+			{
+				Debug.LogError("Cell is null");
+				return;
+			}
+			if (this.cell != null)
+			{
+				this.cell.PlacedObject = null;
+			}
+			this.cell = cell;
+			cell.PlacedObject = this;
+		}
+
+		public Vector2Int GridPosition
+		{
+			get => cell.GridPosition;
+		}
+
+		public Cell Cell
+		{
+			get => cell;
+		}
 	}
 }

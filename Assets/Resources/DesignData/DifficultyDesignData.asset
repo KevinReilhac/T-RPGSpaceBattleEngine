@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebce3a03ca870c948b90f49854b28aa7, type: 3}
+  m_Name: DifficultyDesignData
+  m_EditorClassIdentifier: 
+  difficulties:
+  - name: Easy
+    enemyDamageMultiplicator: 0.8
+    enemyLifeMultiplicator: 0.8
+  - name: Normal
+    enemyDamageMultiplicator: 1
+    enemyLifeMultiplicator: 1
+  - name: Hard
+    enemyDamageMultiplicator: 1.2
+    enemyLifeMultiplicator: 1.2

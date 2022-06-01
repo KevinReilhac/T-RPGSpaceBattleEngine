@@ -12,7 +12,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0cc29aa93eb87d40afbff629c17e5a9, type: 3}
   m_Name: ShipTypes
   m_EditorClassIdentifier: 
-  types: []
+  types:
+  - Destroyer
+  - Cruiser
+  - Type 3
+  - Type 4
   damagesFromTypes:
-    list: []
-    keyCollision: 0
+  - type: 0
+    damagesFromType:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+  - type: 1
+    damagesFromType:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+  - type: 2
+    damagesFromType:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+  - type: 3
+    damagesFromType:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+  - type: 4
+    damagesFromType:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
