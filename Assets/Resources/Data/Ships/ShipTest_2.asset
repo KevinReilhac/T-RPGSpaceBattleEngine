@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84c9cd53edbbf114f94d93f8fd9491f8, type: 3}
   m_Name: ShipTest_2
   m_EditorClassIdentifier: 
-  price: 5000
-  health: 300
+  price: 3000
+  health: 1500
   actionPoints: 2
   speed: 3
   evade: 20
   armor: 20
   flac: 0
   type: 0
+  sprite: {fileID: 21300000, guid: e6a05c926e93f2a439ba44c665f7badf, type: 3}
   attacks:
   - {fileID: 11400000, guid: ae100a687476846469f64265866822c6, type: 2}
   - {fileID: 11400000, guid: ee2d0c1e7097a48439ecf1349683aa50, type: 2}
-  sprite: {fileID: 21300000, guid: e6a05c926e93f2a439ba44c665f7badf, type: 3}

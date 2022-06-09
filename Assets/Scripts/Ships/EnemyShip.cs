@@ -44,7 +44,6 @@ namespace Kebab.BattleEngine.Ships
 		{
 			if (ai == null)
 			{
-				Debug.LogError("AI not set");
 				onEndPlay.Invoke();
 				return;
 			}
@@ -62,6 +61,11 @@ namespace Kebab.BattleEngine.Ships
 		{
 			for (int i = 0; i < MaxActionPoints; i++)
 			{
+				if (BattleManager.instance.GetShips(ShipOwner.Player).Count == 0)
+				{
+					onEndPlay.Invoke();
+					yield break;
+				}
 				bool waitCondition = false;
 				ai.Play(() => waitCondition = true);
 				yield return new WaitUntil(() => waitCondition);

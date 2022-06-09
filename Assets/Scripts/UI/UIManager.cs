@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Kebab.Managers;
 
 using Kebab.BattleEngine.Ships;
+using Kebab.BattleEngine.Ships.Buffs.UI;
 namespace Kebab.BattleEngine.UI
 {
 	public class UIManager : Manager<UIManager>
@@ -12,6 +13,7 @@ namespace Kebab.BattleEngine.UI
 		[SerializeField] private UI_ShipDetailsPanel shipDetailsPanel = null;
 		[SerializeField] private UI_ActionsPanel actionsPanel = null;
 		[SerializeField] private UI_SupportShipPanel supportPanel = null;
+		[SerializeField] private UI_BuffPanel buffPanel = null;
 		[SerializeField] private Button endTurnButton = null;
 		[SerializeField] private Canvas canvas = null;
 
@@ -37,6 +39,11 @@ namespace Kebab.BattleEngine.UI
 			shipDetailsPanel.SetShip(ship);
 			actionsPanel.Setup(ship);
 			selectedPlayerShip = ship;
+		}
+
+		public void OpenBuffPanel()
+		{
+			buffPanel.Open(selectedPlayerShip);
 		}
 
 		public Canvas Canvas

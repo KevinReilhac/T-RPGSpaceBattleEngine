@@ -2,6 +2,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 using Kebab.BattleEngine.Ships;
 using Kebab.BattleEngine.Attacks;
@@ -15,8 +16,14 @@ namespace Kebab.BattleEngine.UI
 		[SerializeField] private Transform buttonsParent = null;
 		[Header("Prefabs")]
 		[SerializeField] private UI_ActionsPanelButton buttonPrefab = null;
+		[SerializeField] private Button buffButton = null;
 
 		private PlayerShip ship = null;
+
+		private void Awake()
+		{
+			buffButton.onClick.AddListener(UIManager.instance.OpenBuffPanel);
+		}
 
 		public void Setup(PlayerShip ship)
 		{
@@ -25,10 +32,11 @@ namespace Kebab.BattleEngine.UI
 			if (ship == null)
 				return;
 			buttonsParent.ClearChilds();
-			ship.Attacks.ForEach(CreateButton);
+			ship.Attacks.ForEach(CreateAttackButton);
+			buffButton.interactable = (ship.CurrentActionPoints > 0);
 		}
 
-		private void CreateButton(SO_Attack attack)
+		private void CreateAttackButton(SO_Attack attack)
 		{
 			UI_ActionsPanelButton buttonInstance = Instantiate(buttonPrefab, buttonsParent);
 

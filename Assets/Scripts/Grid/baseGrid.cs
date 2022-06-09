@@ -23,6 +23,7 @@ namespace Kebab.BattleEngine.Map
 		[Header("Map Options")]
 		[SerializeField] [OnValueChanged("GenerateMap")] private Vector2Int mapSize = new Vector2Int(30, 15);
 		[SerializeField] [OnValueChanged("OnCellsOutlineSizeChanged")] private float cellsOutlineSize = 0.02f;
+		[SerializeField] [OnValueChanged("UpdateBounds")] private Vector2 boundsOffset = new Vector2();
 		[Header("Size")]
 		[SerializeField] [OnValueChanged("OnCellsSizeChanged")] protected float cellSize = 1f;
 		[Header("Prefabs")]
@@ -240,6 +241,7 @@ namespace Kebab.BattleEngine.Map
 
 			foreach (Cell cell in cells)
 				mapBounds.Encapsulate(cell.Collider.bounds);
+			mapBounds.size += (Vector3)boundsOffset;
 		}
 
 		public Bounds Bounds
@@ -290,7 +292,7 @@ namespace Kebab.BattleEngine.Map
 		#endregion
 
 		#region Gizmos
-		private void OnDrawGizmos()
+		private void OnDrawGizmosSelected()
 		{
 			if (Application.isPlaying && !drawGizmos)
 				return;

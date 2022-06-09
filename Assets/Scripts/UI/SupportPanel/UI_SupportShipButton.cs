@@ -5,6 +5,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 using Kebab.BattleEngine.Ships;
+using Kebab.BattleEngine.MoneySystem;
 namespace Kebab.BattleEngine.UI
 {
 	public class UI_SupportShipButton : MonoBehaviour
@@ -19,6 +20,7 @@ namespace Kebab.BattleEngine.UI
 		private void Awake()
 		{
 			button.onClick.AddListener(OnButtonClicked);
+			MoneyManager.instance.OnPriceChange.AddListener(OnMoneyChanged);
 		}
 
 		public void Setup(SO_Ship so_ship)
@@ -26,11 +28,19 @@ namespace Kebab.BattleEngine.UI
 			image.sprite = so_ship.sprite;
 			price.text = so_ship.price.ToString();
 			target = so_ship;
+			OnMoneyChanged(MoneyManager.instance.Money);
+		}
+
+		private void OnMoneyChanged(int money)
+		{
+			if (target != null)
+				button.interactable = money >= target.price;
 		}
 
 		private void OnButtonClicked()
 		{
-			onSelected.Invoke(target);
+			if (MoneyManager.instance.CanPay(target.price))
+				onSelected.Invoke(target);
 		}
 
 		public UnityEvent<SO_Ship> OnSelected

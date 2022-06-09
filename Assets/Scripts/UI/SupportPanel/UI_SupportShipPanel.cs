@@ -5,6 +5,7 @@ using UnityEngine.Events;
 
 using Kebab.BattleEngine.Ships;
 using Kebab.BattleEngine.Map;
+using Kebab.BattleEngine.MoneySystem;
 using Kebab.Extentions;
 
 namespace Kebab.BattleEngine.UI
@@ -55,6 +56,7 @@ namespace Kebab.BattleEngine.UI
 			Ship ship = Instantiate(shipPrefab, cell.transform.position, Quaternion.identity, shipsParent);
 
 			BattleManager.instance.CanSelectPlayerShips = true;
+			MoneyManager.instance.Pay(shipData.price);
 			ship.SetupData(shipData);
 			ship.AlignToGrid();
 		}

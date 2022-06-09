@@ -33,6 +33,7 @@ namespace Kebab.BattleEngine.Ships
 
 		private SpriteRenderer spriteRenderer = null;
 		private UnityEvent<int> onHit = new UnityEvent<int>();
+		private ShipBuff buffs = new ShipBuff();
 
 		protected int currentActionPoints = 2;
 		protected int currentHealth = 0;
@@ -50,6 +51,16 @@ namespace Kebab.BattleEngine.Ships
 			currentActionPoints = MaxActionPoints;
 		}
 
+		public void UseActionPoint()
+		{
+			currentActionPoints--;
+		}
+
+		public void ResetActionPoints()
+		{
+			currentActionPoints = MaxActionPoints;
+		}
+
 		public void SetupData(SO_Ship shipData)
 		{
 			if (shipData == null)
@@ -60,7 +71,7 @@ namespace Kebab.BattleEngine.Ships
 
 		public List<Cell> GetMoveRangeCells()
 		{
-			return BattleManager.instance.GridMap.GetCellRange(GridPosition, shipData.speed, false);
+			return BattleManager.instance.GridMap.GetCellRange(GridPosition, Speed, false);
 		}
 
 		public void ApplyDamages(int damages)
@@ -75,6 +86,7 @@ namespace Kebab.BattleEngine.Ships
 
 			if (currentHealth <= 0)
 			{
+				BattleManager.instance.RemoveShip(this);
 				Destroy(gameObject);
 				onDestroy.Invoke();
 			}
@@ -82,24 +94,8 @@ namespace Kebab.BattleEngine.Ships
 
 		public void Attack(SO_Attack attack, Ship target, UnityAction onAttackEnd)
 		{
-			ShipTypesDesignData shipTypes = DesignDataManager.Get<ShipTypesDesignData>();
-			float distance = Vector2Int.Distance(GridPosition, target.GridPosition);
-			float precision = attack.precision;
-			float damages = attack.damages.GetRandom();
-			float typeDamagesMultiplicator = shipTypes.GetDamageMultiplicator(ShipType, target.ShipType);
-
-			Debug.LogFormat("{0}-->{1}---->{2}", shipTypes.types[ShipType], shipTypes.types[target.ShipType], typeDamagesMultiplicator);
-			damages *= typeDamagesMultiplicator;
-
-			if (!attack.ignoreFlac)
-				damages *= (1 - target.Flac);
-			if (!attack.ignoreArmor)
-				damages -= target.Armor;
-
-			if (distance >= attack.normalDistanceRange.max)
-				precision *= 0.5f;
-			else if (distance <= attack.normalDistanceRange.min)
-				precision *= 1.5f;
+			int damages = GetDamages(attack, target);
+			int precision = GetPrecision(attack, target);
 
 			if (attack.attackVisual != null)
 			{
@@ -112,8 +108,8 @@ namespace Kebab.BattleEngine.Ships
 					{
 						ApplyDamagesToTarget(
 							attack.ignoreEvade,
-							Mathf.RoundToInt(damages),
-							Mathf.RoundToInt(precision),
+							damages,
+							precision,
 							target
 						);
 						if (onAttackEnd != null)
@@ -123,19 +119,45 @@ namespace Kebab.BattleEngine.Ships
 			}
 			else
 			{
-				ApplyDamagesToTarget(attack.ignoreEvade, Mathf.RoundToInt(damages), Mathf.RoundToInt(precision), target);
-				if (onAttackEnd != null)
-					onAttackEnd.Invoke();
+				ApplyDamagesToTarget(attack.ignoreEvade, damages, precision, target);
+				onAttackEnd?.Invoke();
 			}
+		}
+
+		public int GetDamages(SO_Attack attack, Ship target)
+		{
+			ShipTypesDesignData shipTypes = DesignDataManager.Get<ShipTypesDesignData>();
+
+			float distance = Vector2Int.Distance(GridPosition, target.GridPosition);
+			float damages = attack.damages.GetRandom();
+			float typeDamagesMultiplicator = shipTypes.GetTypeDamageMultiplicator(ShipType, target.ShipType);
+
+			damages *= typeDamagesMultiplicator;
+
+			if (!attack.ignoreFlac)
+				damages *= (1 - target.Flac);
+			if (!attack.ignoreArmor)
+				damages -= target.Armor;
+			if (target.Owner == ShipOwner.Player)
+				damages *= DifficultyManager.instance.CurrentDifficulty.enemyDamageMultiplicator;
+	
+			return (Mathf.RoundToInt(damages));
+		}
+
+		public int GetPrecision(SO_Attack attack, Ship target)
+		{
+			float distance = Vector2Int.Distance(GridPosition, target.GridPosition);
+			float precision = attack.precision;
+
+			if (distance >= attack.normalDistanceRange.max)
+				precision *= 0.5f;
+			else if (distance <= attack.normalDistanceRange.min)
+				precision *= 1.5f;
+			return (Mathf.RoundToInt(precision));
 		}
 
 		private void ApplyDamagesToTarget(bool ignoreEvade, int damages, int precision, Ship target)
 		{
-			Debug.Log("Precision : " + precision + " Evade : " + target.Evade);
-
-			if (target.Owner == ShipOwner.Player)
-				damages = Mathf.RoundToInt(damages * DifficultyManager.instance.CurrentDifficulty.enemyDamageMultiplicator);
-
 			if (ignoreEvade || precision > target.Evade)
 				target.ApplyDamages(Mathf.RoundToInt(damages));
 			else
@@ -167,22 +189,22 @@ namespace Kebab.BattleEngine.Ships
 
 		public int Speed
 		{
-			get => shipData.speed;
+			get => shipData.speed + buffs.speed;
 		}
 
 		public int Armor
 		{
-			get => shipData.armor;
+			get => shipData.armor + buffs.armor;
 		}
 
 		public int Evade
 		{
-			get => shipData.evade;
+			get => shipData.evade + buffs.evade;
 		}
 
 		public float Flac
 		{
-			get => shipData.flac;
+			get => shipData.flac + buffs.flac;
 		}
 
 		public int ShipType
@@ -205,9 +227,19 @@ namespace Kebab.BattleEngine.Ships
 			get => onHit;
 		}
 
+		public UnityEvent OnDestroy
+		{
+			get => onDestroy;
+		}
+
 		public SO_Ship ShipData
 		{
 			get => shipData;
+		}
+
+		public ShipBuff Buffs
+		{
+			get => buffs;
 		}
 		#endregion
 

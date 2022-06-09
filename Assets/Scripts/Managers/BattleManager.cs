@@ -7,11 +7,15 @@ using Kebab.Managers;
 using Kebab.BattleEngine.Ships;
 using Kebab.BattleEngine.Map;
 using Kebab.BattleEngine.UI;
+using Kebab.BattleEngine.MoneySystem;
 
 namespace Kebab.BattleEngine
 {
 	public class BattleManager : Manager<BattleManager>
 	{
+		[SerializeField] private int startMoney = 5000;
+		[SerializeField] private UnityEvent onVictory = new UnityEvent();
+
 		private baseGrid mapManager = null;
 		private UnityEvent<PlayerShip> onShipSelected = new UnityEvent<PlayerShip>();
 		private List<Ship> ships = new List<Ship>();
@@ -19,10 +23,13 @@ namespace Kebab.BattleEngine
 		private PlayerShip selectedPlayerShip = null;
 		private bool isPlayerTurn = true;
 		private bool canSelectPlayerShips = true;
+		private List<baseVictoryCondition> victoryConditions = null;
 
 		protected override void xAwake()
 		{
 			base.xAwake();
+			MoneyManager.instance.SetMoney(startMoney);
+			victoryConditions = GameObject.FindObjectsOfType<baseVictoryCondition>().ToList();
 		}
 
 		private void Update()
@@ -33,9 +40,16 @@ namespace Kebab.BattleEngine
 				HidePlayerShipsSelection();
 		}
 
+		private void CheckVictory()
+		{
+			if (victoryConditions.All((v) => v.IsValidate()))
+				onVictory.Invoke();
+		}
+
 		#region EnemyTurn
 		public void StartEnemyTurn()
 		{
+			UnselectPlayerShip();
 			StartCoroutine(__EnemyTurnCoroutine());
 		}
 
@@ -49,15 +63,18 @@ namespace Kebab.BattleEngine
 			{
 				bool shipPlayed = false;
 
-				Debug.Log(ship);
+				if (GetShips(ShipOwner.Player).Count == 0)
+					break;
 				ship.Play(() => shipPlayed = true);
 				yield return new WaitUntil(() => shipPlayed);
 			}
+			GetShips(ShipOwner.Player).ForEach((s) => s.ResetActionPoints());
 			isPlayerTurn = true;
 		}
 		#endregion
 
 		#region PlayerTurn
+
 		public void AddShip(Ship ship)
 		{
 			ships.Add(ship);
@@ -103,6 +120,11 @@ namespace Kebab.BattleEngine
 		}
 
 		#endregion
+
+		public void RemoveShip(Ship ship)
+		{
+			ships.Remove(ship);
+		}
 
 		#region Getters
 		public List<Ship> GetShips(ShipOwner shipsOwner = ShipOwner.All)

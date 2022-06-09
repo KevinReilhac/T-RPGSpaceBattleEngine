@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using NaughtyAttributes;
 using Kebab.BattleEngine.Extentions;
-
+using Kebab.BattleEngine.Ships;
 namespace Kebab.BattleEngine.Map
 {
 	public class GridMapCamera : MonoBehaviour
@@ -27,10 +27,13 @@ namespace Kebab.BattleEngine.Map
 			gridMap = BattleManager.instance.GridMap;
 			cameraSizeMax = gridMap.Bounds.extents.y;
 			UpdateCameraMoveBounds();
+			AutoCenterCam();
 		}
 
 		private void LateUpdate()
 		{
+			if (Input.GetKeyDown(KeyCode.Space))
+				AutoCenterCam();
 			UpdateDrag();
 			UpdateZoom();
 		}
@@ -46,6 +49,19 @@ namespace Kebab.BattleEngine.Map
 		private void SetCameraInMoveBounds()
 		{
 			transform.position = cameraMoveBounds.ClosestPoint(transform.position);
+		}
+
+		private void AutoCenterCam()
+		{
+			Bounds bounds = new Bounds();
+			List<Ship> ships = BattleManager.instance.GetShips(ShipOwner.All);
+			Vector3 center = Vector3.zero;
+
+			foreach (Ship ship in ships)
+			{
+				center += ship.transform.position;
+			}
+			transform.position = center;
 		}
 
 		private void UpdateDrag()

@@ -23,7 +23,7 @@ namespace Kebab.BattleEngine.Ships.EditorTools
 
 			//List
 			typeListProperty = serializedObject.FindProperty("types");
-			typeReorderableList = new ReorderableList(serializedObject, typeListProperty, true, true, true, true);
+			typeReorderableList = new ReorderableList(serializedObject, typeListProperty, false, true, true, true);
 			typeReorderableList.drawElementCallback += DrawListItems;
 			typeReorderableList.drawHeaderCallback += DrawHeader;
 			typeReorderableList.onChangedCallback += (_) => UpdateDamageTypeDict();

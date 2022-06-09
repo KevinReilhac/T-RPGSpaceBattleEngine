@@ -27,7 +27,7 @@ namespace Kebab.BattleEngine.Ships
 		[SerializeField] public List<string> types = null;
 		[SerializeField] public List<DamageMultiplicatorByType> damagesFromTypes;
 
-		public float GetDamageMultiplicator(int from, int to)
+		public float GetTypeDamageMultiplicator(int from, int to)
 		{
 
 			if (damagesFromTypes == null || (from < 0 || from >= damagesFromTypes.Count) || (to < 0 || to >= damagesFromTypes.Count))

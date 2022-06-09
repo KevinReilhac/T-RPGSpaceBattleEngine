@@ -35,7 +35,7 @@ namespace Kebab.BattleEngine.Ships
 				BattleManager.instance.UnselectPlayerShip();
 		}
 
-		private void EndAction()
+		public void EndAction()
 		{
 			currentActionPoints--;
 			BattleManager.instance.UnselectPlayerShip();

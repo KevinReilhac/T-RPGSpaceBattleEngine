@@ -29,13 +29,15 @@ namespace Kebab.BattleEngine.UI
 
 		private void Awake()
 		{
-			startTextPosition = hitText.transform.position;
+			startTextPosition = hitText.transform.localPosition;
 			hitText.gameObject.SetActive(false);
 			ship.OnHit.AddListener(OnHit);
 		}
 
 		private void OnHit(int value)
 		{
+			if (ship.CurrentHealth <= 0)
+				return;
 			if (value > 0)
 				HealthBarAnimation();
 			HitTextAnimation(value);
@@ -55,8 +57,8 @@ namespace Kebab.BattleEngine.UI
 			hitText.gameObject.SetActive(true);
 			hitText.color = color;
 			hitText.text = text;
-			hitText.transform.position = startTextPosition;
-			hitText.transform.DOMoveY(startTextPosition.y + hitTextAnimYMoveOffset, animTime)
+			hitText.transform.localPosition = startTextPosition;
+			hitText.transform.DOLocalMoveY(startTextPosition.y + hitTextAnimYMoveOffset, animTime)
 				.SetEase(hitTextAnimYMoveEase);
 			hitText.DOFade(0, animTime)
 				.ChangeStartValue(color)
