@@ -41,9 +41,9 @@ namespace Kebab.BattleEngine.Map
 			}
 		}
 
-		public override List<Cell> GetCellRange(Vector2Int center, int range, bool getFullCells = true)
+		public override CellCollection GetCellRange(Vector2Int center, int range, bool getFullCells = true)
 		{
-			List<Cell> cells = new List<Cell>();
+			CellCollection cells = new CellCollection();
 
 			for (int i = 1; i <= range; i++)
 			{
@@ -66,9 +66,9 @@ namespace Kebab.BattleEngine.Map
 			return (cells);
 		}
 
-		public override List<Cell> GetCellLine(Vector2Int p1, Vector2Int p2, bool blocking = false)
+		public override CellCollection GetCellLine(Vector2Int p1, Vector2Int p2, bool blocking = false)
 		{
-			List<Cell> cells = new List<Cell>();
+			CellCollection cells = new CellCollection();
 			HexOffsetCoordinates[] line = HexLib.GetLine(p1.ToHexOffsetCoords(), p2.ToHexOffsetCoords());
 
 			foreach (HexOffsetCoordinates coord in line)

@@ -21,5 +21,9 @@ namespace Kebab.BattleEngine.Attacks
 		public bool ignoreArmor = false;
 		[Header("References")]
 		public AttackVisual attackVisual = null;
+
+		[Header("Audio")]
+		public AudioClip onStartClip = null;
+		public AudioClip onOnHitClip = null;
 	}
 }

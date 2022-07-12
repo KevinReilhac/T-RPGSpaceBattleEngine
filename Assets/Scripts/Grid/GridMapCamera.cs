@@ -48,20 +48,29 @@ namespace Kebab.BattleEngine.Map
 
 		private void SetCameraInMoveBounds()
 		{
-			transform.position = cameraMoveBounds.ClosestPoint(transform.position);
+			transform.position = gridMap.Bounds.ClosestPoint(transform.position);
 		}
 
 		private void AutoCenterCam()
 		{
-			Bounds bounds = new Bounds();
-			List<Ship> ships = BattleManager.instance.GetShips(ShipOwner.All);
-			Vector3 center = Vector3.zero;
+			Bounds targetBounds = new Bounds();
 
-			foreach (Ship ship in ships)
+			BattleManager.instance.GetShips().ForEach(s => targetBounds.Encapsulate(s.transform.position));
+
+			float screenRatio = (float)Screen.width / (float)Screen.height;
+			float targetRatio = targetBounds.size.x / targetBounds.size.y;
+
+			if (screenRatio >= targetRatio)
 			{
-				center += ship.transform.position;
+				Camera.main.orthographicSize = targetBounds.size.y / 2;
 			}
-			transform.position = center;
+			else
+			{
+				float differenceInSize = targetRatio / screenRatio;
+				Camera.main.orthographicSize = targetBounds.size.y / 2 * differenceInSize;
+			}
+
+			transform.position = new Vector3(targetBounds.center.x, targetBounds.center.y, -1f);
 		}
 
 		private void UpdateDrag()

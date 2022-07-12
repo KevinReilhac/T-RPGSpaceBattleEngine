@@ -5,14 +5,12 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using Shapes2D;
 
+using Kebab.DesignData;
+
 namespace Kebab.BattleEngine.Map
 {
 	public class Cell : MonoBehaviour
 	{
-		[SerializeField] private Color disabledOutlineColor = Color.gray;
-		[SerializeField] private Color outlineColor = Color.white;
-		[SerializeField] private Color hoveredOutlineColor = Color.blue;
-		[SerializeField] private Color clickedColor = Color.green;
 		[SerializeField] private Color interactableInsideDefaultColor = Color.blue;
 		[SerializeField] private float fillAlpha = 0.3f;
 
@@ -25,11 +23,12 @@ namespace Kebab.BattleEngine.Map
 		private bool isInteractable = false;
 		private UnityAction<Cell> onSelected = null;
 		private GridPlacable placedObject = null;
+		private CellColorsDesignData cellColorsDesignData = null;
 
 		private void Awake()
 		{
-			SetInteractable(false);
-			SetBaseOutlineColor();
+			SetDisabledOutlineColor();
+			cellColorsDesignData = DesignDataManager.Get<CellColorsDesignData>();
 			shapeCollider = GetComponent<Collider2D>();
 		}
 
@@ -86,30 +85,30 @@ namespace Kebab.BattleEngine.Map
 		#region Setters
 		public void SetHoveredColor()
 		{
-			shape.settings.outlineColor = hoveredOutlineColor;
+			shape.settings.outlineColor = CellColorsDesignData.hoverOutlineColor;
 		}
 
 		public void UpdateOutlineColor()
 		{
 			if (isInteractable)
-				SetBaseOutlineColor();
+				SetSelectableOutlineColor();
 			else
 				SetDisabledOutlineColor();
 		}
 
 		public void SetDisabledOutlineColor()
 		{
-			shape.settings.outlineColor = disabledOutlineColor;
+			shape.settings.outlineColor = CellColorsDesignData.defaultOutlineColor;
 		}
 
-		public void SetBaseOutlineColor()
+		public void SetSelectableOutlineColor()
 		{
-			shape.settings.outlineColor = outlineColor;
+			shape.settings.outlineColor = CellColorsDesignData.selectableOutlineColor;
 		}
 
 		public void SetClickedColor()
 		{
-			shape.settings.outlineColor = clickedColor;
+			shape.settings.outlineColor = CellColorsDesignData.clickedOutlineColor;
 		}
 
 		public void SetInsideColor(Color color)
@@ -120,7 +119,7 @@ namespace Kebab.BattleEngine.Map
 
 		public void ResetInsideColor()
 		{
-			Shape.settings.fillColor = new Color();
+			Shape.settings.fillColor = Color.clear;
 		}
 
 		public void SetInteractable(bool interactable)
@@ -144,7 +143,7 @@ namespace Kebab.BattleEngine.Map
 		private void OnMouseExit()
 		{
 			isClicked = false;
-			SetBaseOutlineColor();
+			UpdateOutlineColor();
 		}
 
 		private void OnMouseDown()
@@ -168,5 +167,15 @@ namespace Kebab.BattleEngine.Map
 			}
 		}
 		#endregion
+
+		private CellColorsDesignData CellColorsDesignData
+		{
+			get
+			{
+				if (cellColorsDesignData == null)
+					cellColorsDesignData = DesignDataManager.Get<CellColorsDesignData>();
+				return (cellColorsDesignData);
+			}
+		}
 	}
 }

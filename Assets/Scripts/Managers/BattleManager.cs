@@ -3,102 +3,159 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+
 using Kebab.Managers;
+using Kebab.UISystem;
+using Kebab.BattleEngine.GamePhases;
 using Kebab.BattleEngine.Ships;
+using Kebab.BattleEngine.Ships.UI;
 using Kebab.BattleEngine.Map;
 using Kebab.BattleEngine.UI;
 using Kebab.BattleEngine.MoneySystem;
+using Kebab.BattleEngine.Conditions;
 
 namespace Kebab.BattleEngine
 {
+
+	public enum GamePhaseEnum
+	{
+		NONE,
+		PlaceUnits,
+		PlayerTurn,
+		EnemyTurn,
+		EndBattle
+	}
 	public class BattleManager : Manager<BattleManager>
 	{
 		[SerializeField] private int startMoney = 5000;
-		[SerializeField] private UnityEvent onVictory = new UnityEvent();
+		[SerializeField] private int playfieldSeparationDelta = 0;
 
 		private baseGrid mapManager = null;
-		private UnityEvent<PlayerShip> onShipSelected = new UnityEvent<PlayerShip>();
 		private List<Ship> ships = new List<Ship>();
-
 		private PlayerShip selectedPlayerShip = null;
-		private bool isPlayerTurn = true;
-		private bool canSelectPlayerShips = true;
-		private List<baseVictoryCondition> victoryConditions = null;
+
+
+		//Game phases
+		private Dictionary<GamePhaseEnum, baseGamePhase> gamePhasesDict = null;
+		private GamePhaseEnum currentGamePhase = GamePhaseEnum.NONE;
+
+		//Events
+		private UnityEvent<PlayerShip> onShipSelected = new UnityEvent<PlayerShip>();
+		private UnityEvent onVictory = new UnityEvent();
+		private UnityEvent onDefeat = new UnityEvent();
+		private UnityEvent<GamePhaseEnum> onGameStateChanged = new UnityEvent<GamePhaseEnum>();
+		private UnityEvent onShipListUpdate = new UnityEvent();
 
 		protected override void xAwake()
 		{
 			base.xAwake();
 			MoneyManager.instance.SetMoney(startMoney);
-			victoryConditions = GameObject.FindObjectsOfType<baseVictoryCondition>().ToList();
+			UIManager.instance.Init();
+			CreateGamePhases();
+
+		}
+
+		private void Start()
+		{
+			SetGamePhase(GamePhaseEnum.PlaceUnits);
 		}
 
 		private void Update()
 		{
-			if (isPlayerTurn && canSelectPlayerShips)
-				SetPlayerShipSelection();
-			else
-				HidePlayerShipsSelection();
-		}
+			if (gamePhasesDict.ContainsKey(currentGamePhase))
+				gamePhasesDict[currentGamePhase].Update();
 
-		private void CheckVictory()
-		{
-			if (victoryConditions.All((v) => v.IsValidate()))
-				onVictory.Invoke();
-		}
-
-		#region EnemyTurn
-		public void StartEnemyTurn()
-		{
-			UnselectPlayerShip();
-			StartCoroutine(__EnemyTurnCoroutine());
-		}
-
-		private IEnumerator __EnemyTurnCoroutine()
-		{
-			List<EnemyShip> ships = GetShips<EnemyShip>(ShipOwner.Enemy);
-
-			isPlayerTurn = false;
-			HidePlayerShipsSelection();
-			foreach (EnemyShip ship in ships)
+			if (currentGamePhase == GamePhaseEnum.PlayerTurn || currentGamePhase == GamePhaseEnum.EnemyTurn)
 			{
-				bool shipPlayed = false;
-
-				if (GetShips(ShipOwner.Player).Count == 0)
-					break;
-				ship.Play(() => shipPlayed = true);
-				yield return new WaitUntil(() => shipPlayed);
+				CheckVictory();
+				CheckDefeat();
 			}
-			GetShips(ShipOwner.Player).ForEach((s) => s.ResetActionPoints());
-			isPlayerTurn = true;
+		}
+
+		private void EndBattle()
+		{
+			SetGamePhase(GamePhaseEnum.EndBattle);
+			SetCanSelectPlayerShips(false);
+			UnselectPlayerShip();
+		}
+
+
+		#region GamePhases
+		private void CreateGamePhases()
+		{
+			gamePhasesDict = new Dictionary<GamePhaseEnum, baseGamePhase>()
+			{
+				{GamePhaseEnum.PlaceUnits, new PlaceUnitsGamePhase()},
+				{GamePhaseEnum.PlayerTurn, new PlayerTurnGamePhase()},
+				{GamePhaseEnum.EnemyTurn, new EnemyTurnGamePhase()},
+			};
+		}
+
+		public void SetGamePhase(GamePhaseEnum newGamePhase)
+		{
+			if (newGamePhase == currentGamePhase)
+				return;
+
+			if (gamePhasesDict.ContainsKey(currentGamePhase))
+				gamePhasesDict[currentGamePhase].Stop();
+			if (gamePhasesDict.ContainsKey(newGamePhase))
+				gamePhasesDict[newGamePhase].Begin();
+
+			currentGamePhase = newGamePhase;
+			onGameStateChanged.Invoke(currentGamePhase);
 		}
 		#endregion
 
-		#region PlayerTurn
-
-		public void AddShip(Ship ship)
+		#region CheckDefeat
+		///TMP
+		private void CheckDefeat()
 		{
-			ships.Add(ship);
+			if (GetShips(ShipOwner.Player).Count <= 0)
+				Defeat();
 		}
 
-		public void SetPlayerShipSelection()
+		private void Defeat()
+		{
+			onDefeat.Invoke();
+			UIManager.instance.ShowPanel<UI_DefeatPanel>();
+			EndBattle();
+		}
+		#endregion
+
+		#region Victory
+		///TMP
+		private void CheckVictory()
+		{
+			if (GetShips(ShipOwner.Enemy).Count <= 0)
+				Victory();
+		}
+
+		private void Victory()
+		{
+			onVictory.Invoke();
+			UIManager.instance.ShowPanel<UI_VictoryPanel>();
+			EndBattle();
+		}
+		#endregion
+
+		#region ShipSelection
+
+		public void SetCanSelectPlayerShips(bool canSelect)
 		{
 			List<Ship> ships = GetShips(ShipOwner.Player);
 
 			foreach (Ship ship in ships)
 			{
-				ship.IsSelectable = true;
-				ship.Cell.OnSelected = (c) => SelectPlayerShip(ship as PlayerShip);
-			}
-		}
-
-		public void HidePlayerShipsSelection()
-		{
-			List<Ship> ships = GetShips(ShipOwner.Player);
-
-			foreach (Ship ship in ships)
-			{
-				ship.IsSelectable = false;
-				ship.Cell.OnSelected = null;
+				Debug.Log(ship);
+				ship.IsSelectable = canSelect;
+				if (!canSelect)
+				{
+					ship.Cell.OnSelected = null;
+				}
+				else
+				{
+					ship.Cell.OnSelected = (c) => SelectPlayerShip(ship as PlayerShip);
+				}
 			}
 		}
 
@@ -106,25 +163,33 @@ namespace Kebab.BattleEngine
 		{
 			UnselectPlayerShip();
 			selectedPlayerShip = ship;
-			selectedPlayerShip.OnSelected();
-			UIManager.instance.SelectShip(selectedPlayerShip);
+			selectedPlayerShip.Select();
+
 		}
 
 		public void UnselectPlayerShip()
 		{
 			if (selectedPlayerShip == null)
 				return;
-			selectedPlayerShip.HideAllSelections();
-			selectedPlayerShip.OnUnselected();
-			UIManager.instance.SelectShip(null);
+			selectedPlayerShip.Unselect();
+
 		}
 
 		#endregion
 
+		#region ShipList
 		public void RemoveShip(Ship ship)
 		{
 			ships.Remove(ship);
+			onShipListUpdate.Invoke();
 		}
+
+		public void AddShip(Ship ship)
+		{
+			ships.Add(ship);
+			onShipListUpdate.Invoke();
+		}
+		#endregion
 
 		#region Getters
 		public List<Ship> GetShips(ShipOwner shipsOwner = ShipOwner.All)
@@ -148,6 +213,21 @@ namespace Kebab.BattleEngine
 			return (typedShips);
 		}
 
+		public UnityEvent OnShipListUpdate
+		{
+			get => onShipListUpdate;
+		}
+
+		public UnityEvent OnVictory
+		{
+			get => onVictory;
+		}
+
+		public UnityEvent OnDefeat
+		{
+			get => onDefeat;
+		}
+
 		public UnityEvent<PlayerShip> OnShipSelected
 		{
 			get => onShipSelected;
@@ -168,15 +248,37 @@ namespace Kebab.BattleEngine
 			get => selectedPlayerShip;
 		}
 
-		public bool IsPlayerTurn
+		public GamePhaseEnum GameState
 		{
-			get => isPlayerTurn;
+			get => currentGamePhase;
+			set => SetGamePhase(value);
 		}
 
-		public bool CanSelectPlayerShips
+		public int GridXSeparation
 		{
-			get => canSelectPlayerShips;
-			set => canSelectPlayerShips = value;
+			get => Mathf.Clamp((GridMap.Size.x / 2) + playfieldSeparationDelta, 0, GridMap.Size.x - 1);
+		}
+		#endregion
+
+		#region Gizmos
+		private void OnDrawGizmos()
+		{
+			DrawFieldSeparationGizmo();
+		}
+
+		private void DrawFieldSeparationGizmo()
+		{
+			Vector2Int gridMiddle = new Vector2Int(GridMap.Size.x / 2, GridMap.Size.y / 2);
+
+			gridMiddle.x += playfieldSeparationDelta;
+			gridMiddle.x = Mathf.Clamp(gridMiddle.x, 0, GridMap.Size.x - 1);
+			Vector3 gridMiddleWorld = GridMap.GetWorldPosition(gridMiddle);
+
+			Gizmos.color = Color.green;
+			Vector3 upPoint = new Vector3(gridMiddleWorld.x, GridMap.Bounds.center.y + GridMap.Bounds.extents.y);
+			Vector3 downPoint = new Vector3(gridMiddleWorld.x, GridMap.Bounds.center.y - GridMap.Bounds.extents.y);
+
+			Gizmos.DrawLine(upPoint, downPoint);
 		}
 		#endregion
 	}

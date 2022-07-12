@@ -28,7 +28,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "d9dd8d7affad369adef4f9c8e9c25694d1b97043"
+      "hash": "9ecc1af8452a652994eda482cd9435ccbd567f0f"
     },
     "com.kebab.ui_system": {
       "version": "git@github.com:KevinReilhac/UISystem.git",
@@ -37,7 +37,7 @@
       "dependencies": {
         "com.kebab.custom_managers": ""
       },
-      "hash": "7f4abc3d58c8cca0af2754495a1859788cd5afa6"
+      "hash": "37126f6f5b33751330b6905cd3ffcccfd0c6cdc9"
     },
     "com.unity.2d.animation": {
       "version": "7.0.5",

@@ -17,6 +17,11 @@ public abstract class ARange<T>
 	public abstract T GetRandom();
 	public abstract T Clamp(T value);
 	public abstract bool IsInRange(T value);
+
+	public override string ToString()
+	{
+		return ($"({min}, {max})");
+	}
 }
 
 [System.Serializable]

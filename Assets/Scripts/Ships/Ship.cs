@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Kebab.DesignData;
+using Kebab.BattleEngine.Audio;
 using Kebab.BattleEngine.Map;
 using Kebab.BattleEngine.Attacks;
 using Kebab.BattleEngine.Difficulty;
@@ -97,28 +98,22 @@ namespace Kebab.BattleEngine.Ships
 			int damages = GetDamages(attack, target);
 			int precision = GetPrecision(attack, target);
 
+			AudioManager.instance.PlaySFX(attack.onStartClip);
 			if (attack.attackVisual != null)
 			{
 				AttackVisual visual = Instantiate(attack.attackVisual, transform.parent);
 
-				visual.Setup(
-					GridPosition,
-					target.GridPosition,
-					() =>
+				visual.Setup(GridPosition, target.GridPosition, () =>
 					{
-						ApplyDamagesToTarget(
-							attack.ignoreEvade,
-							damages,
-							precision,
-							target
-						);
-						if (onAttackEnd != null)
-							onAttackEnd.Invoke();
+						onAttackEnd?.Invoke();
+						ApplyDamagesToTarget(attack.ignoreEvade, damages, precision, target);
+						AudioManager.instance.PlaySFX(attack.onOnHitClip);
 					}
 				);
 			}
 			else
 			{
+				AudioManager.instance.PlaySFX(attack.onOnHitClip);
 				ApplyDamagesToTarget(attack.ignoreEvade, damages, precision, target);
 				onAttackEnd?.Invoke();
 			}
@@ -140,7 +135,7 @@ namespace Kebab.BattleEngine.Ships
 				damages -= target.Armor;
 			if (target.Owner == ShipOwner.Player)
 				damages *= DifficultyManager.instance.CurrentDifficulty.enemyDamageMultiplicator;
-	
+
 			return (Mathf.RoundToInt(damages));
 		}
 
@@ -159,7 +154,9 @@ namespace Kebab.BattleEngine.Ships
 		private void ApplyDamagesToTarget(bool ignoreEvade, int damages, int precision, Ship target)
 		{
 			if (ignoreEvade || precision > target.Evade)
+			{
 				target.ApplyDamages(Mathf.RoundToInt(damages));
+			}
 			else
 				target.ApplyDamages(ON_MISS_DAMAGE_VALUE);
 		}

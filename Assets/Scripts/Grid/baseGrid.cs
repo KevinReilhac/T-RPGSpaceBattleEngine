@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using NaughtyAttributes;
 using Shapes2D;
+
+using Kebab.DesignData;
 using Kebab.Extentions;
 
 namespace Kebab.BattleEngine.Map
@@ -38,6 +40,7 @@ namespace Kebab.BattleEngine.Map
 		private Transform cellsParent = null;
 		private Bounds mapBounds = new Bounds();
 		private UnityEvent<Vector2Int> onCellSelected = new UnityEvent<Vector2Int>();
+		private CellColorsDesignData cellColorsDesignData = null;
 
 		#region Init
 		private void OnEnable()
@@ -47,6 +50,7 @@ namespace Kebab.BattleEngine.Map
 
 		virtual protected void Awake()
 		{
+			cellColorsDesignData = DesignData.DesignDataManager.Get<CellColorsDesignData>();
 			GetExistingCells();
 			UpdateCellsPosition();
 			UpdateBounds();
@@ -60,7 +64,7 @@ namespace Kebab.BattleEngine.Map
 
 		private void OnCellsOutlineSizeChanged()
 		{
-			ApplyMethodOnEachCells((c) => c.Shape.settings.outlineSize = cellsOutlineSize);
+			GetAllCells().ForEach((c) => c.Shape.settings.outlineSize = cellsOutlineSize);
 		}
 
 		private void GetExistingCells()
@@ -86,7 +90,7 @@ namespace Kebab.BattleEngine.Map
 
 		private void OnCellsSizeChanged()
 		{
-			ApplyMethodOnEachCells((c) => c.transform.localScale = Vector3.one * cellSize);
+			GetAllCells().ForEach((c) => c.transform.localScale = Vector3.one * cellSize);
 
 			UpdateCellsPosition();
 			UpdateBounds();
@@ -168,9 +172,9 @@ namespace Kebab.BattleEngine.Map
 
 		#region Getters
 
-		private Cell[] GetAllCells()
+		public CellCollection GetAllCells()
 		{
-			return (mapMatrix.Values.ToArray());
+			return (new CellCollection(mapMatrix.Values.ToList()));
 		}
 
 		public Cell GetCell(Vector2Int position)
@@ -182,8 +186,8 @@ namespace Kebab.BattleEngine.Map
 			return (null);
 		}
 
-		abstract public List<Cell> GetCellRange(Vector2Int center, int range, bool getFullCells = true);
-		abstract public List<Cell> GetCellLine(Vector2Int start, Vector2Int end, bool blocking = true);
+		abstract public CellCollection GetCellRange(Vector2Int center, int range, bool getFullCells = true);
+		abstract public CellCollection GetCellLine(Vector2Int start, Vector2Int end, bool blocking = true);
 		abstract public GridType GridType {get;}
 
 		public Vector3 GetWorldPosition(Vector2Int gridPosition)
@@ -236,7 +240,7 @@ namespace Kebab.BattleEngine.Map
 
 		public void UpdateBounds()
 		{
-			Cell[] cells = GetAllCells();
+			CellCollection cells = GetAllCells();
 			mapBounds = new Bounds(GetCellsParent().transform.position, Vector3.zero);
 
 			foreach (Cell cell in cells)
@@ -257,19 +261,11 @@ namespace Kebab.BattleEngine.Map
 		#region Helpers
 		public void ResetAllCells()
 		{
-			ApplyMethodOnEachCells((c) =>
+			GetAllCells().ForEach((c) =>
 			{
 				c.SetInteractable(false);
 				c.ResetInsideColor();
 			});
-		}
-
-		private void ApplyMethodOnEachCells(UnityAction<Cell> action)
-		{
-			Cell[] cells = GetAllCells();
-
-			foreach (Cell cell in cells)
-				action.Invoke(cell);
 		}
 
 		#endregion
@@ -278,7 +274,7 @@ namespace Kebab.BattleEngine.Map
 		public void SetHoveredCell(Cell cell)
 		{
 			if (hoveredCell)
-				hoveredCell.SetBaseOutlineColor();
+				hoveredCell.SetSelectableOutlineColor();
 			hoveredCell = cell;
 			hoveredCell.SetHoveredColor();
 		}

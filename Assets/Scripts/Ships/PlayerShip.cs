@@ -5,28 +5,40 @@ using UnityEngine;
 using Kebab.BattleEngine.Map;
 using Kebab.BattleEngine.Attacks;
 
+using Kebab.UISystem;
+using Kebab.DesignData;
+
 namespace Kebab.BattleEngine.Ships
 {
 	public class PlayerShip : Ship
 	{
 		private List<Cell> moveCells = null;
 		private bool isSelectedShip = false;
+		private CellColorsDesignData cellColorsDesignData = null;
 
 		override protected void Awake()
 		{
 			base.Awake();
+			cellColorsDesignData = DesignDataManager.Get<CellColorsDesignData>();
 		}
 
-		public void OnSelected()
+		public void Select()
 		{
 			isSelectedShip = true;
 			if (currentActionPoints > 0)
 				DrawMoveSelection();
+
+			UIManager.instance.GetPanel<UI.UI_ActionsPanel>().SetShip(this);
+			UIManager.instance.GetPanel<UI.UI_ShipDetailsPanel>().SetShip(this);
 		}
 
-		public void OnUnselected()
+		public void Unselect()
 		{
 			isSelectedShip = false;
+			HideAllSelections();
+
+			UIManager.instance.GetPanel<UI.UI_ActionsPanel>().SetShip(null);
+			UIManager.instance.GetPanel<UI.UI_ShipDetailsPanel>().SetShip(null);
 		}
 
 		private void Update()
@@ -39,11 +51,12 @@ namespace Kebab.BattleEngine.Ships
 		{
 			currentActionPoints--;
 			BattleManager.instance.UnselectPlayerShip();
+			BattleManager.instance.SetCanSelectPlayerShips(true);
 		}
 
 		public void HideAllSelections()
 		{
-			HideMoveSelection();
+			ClearMoveSelection();
 			HideAttackSelection();
 		}
 
@@ -53,14 +66,12 @@ namespace Kebab.BattleEngine.Ships
 			if (currentActionPoints <= 0)
 				return;
 
-			List<Cell> cells = BattleManager.instance.GetShips(ShipOwner.Enemy)
-				.Select((s) => s.Cell)
-				.ToList();
+			List<Cell> enemyShipCells = GetEnemyShipCells();
 
-			foreach (Cell cell in cells)
+			foreach (Cell cell in enemyShipCells)
 			{
 				cell.SetInteractable(true);
-				cell.SetInsideColor(Color.red);
+				cell.SetInsideColor(cellColorsDesignData.attackFillColor);
 				cell.OnSelected = (c) =>
 				{
 					Ship target = (Ship)c.PlacedObject;
@@ -73,16 +84,21 @@ namespace Kebab.BattleEngine.Ships
 
 		private void HideAttackSelection()
 		{
-			List<Cell> cells = BattleManager.instance.GetShips(ShipOwner.Enemy)
-				.Select((s) => s.Cell)
-				.ToList();
+			List<Cell> enemyShipCells = GetEnemyShipCells();
 
-			foreach (Cell cell in cells)
+			foreach (Cell cell in enemyShipCells)
 			{
 				cell.SetInteractable(true);
 				cell.ResetInsideColor();
 				cell.OnSelected = null;
 			}
+		}
+
+		private List<Cell> GetEnemyShipCells()
+		{
+			return BattleManager.instance.GetShips(ShipOwner.Enemy)
+				.Select((s) => s.Cell)
+				.ToList();
 		}
 		#endregion
 
@@ -94,14 +110,14 @@ namespace Kebab.BattleEngine.Ships
 			movableCells.Where((c) => c.PlacedObject == null).ToList().ForEach((c) =>
 			{
 				c.SetInteractable(true);
-				c.SetInsideColor(Color.blue);
+				c.SetInsideColor(cellColorsDesignData.movableFillColor);
 				c.OnSelected = OnMoveCellSelected;
 			});
 
 			moveCells = movableCells;
 		}
 
-		public void HideMoveSelection()
+		public void ClearMoveSelection()
 		{
 			moveCells.ForEach((c) =>
 			{
@@ -117,9 +133,9 @@ namespace Kebab.BattleEngine.Ships
 		{
 			if (targetCell == this.cell)
 				return;
-			EndAction();
 			BattleManager.instance.GridMap.ResetAllCells();
 			MoveTo(targetCell.GridPosition);
+			EndAction();
 		}
 		#endregion
 
