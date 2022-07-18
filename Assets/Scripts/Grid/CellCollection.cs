@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,6 +33,11 @@ namespace Kebab.BattleEngine.Map
 			}
 
 			return (nearestCell);
+		}
+
+		public CellCollection GetOnlyEmpty()
+		{
+			return (new CellCollection(this.Where(c => c.PlacedObject == null).ToList()));
 		}
 	}
 }

@@ -7,6 +7,7 @@ using Kebab.UISystem;
 using Kebab.DesignData;
 using Kebab.BattleEngine.Map;
 using Kebab.BattleEngine.Ships;
+using Kebab.BattleEngine.MoneySystem;
 
 using Kebab.BattleEngine.UI;
 
@@ -26,32 +27,21 @@ namespace Kebab.BattleEngine.GamePhases
 		public override void Begin()
 		{
 			UIManager.instance.ShowPanel<UI.UI_PlaceUnitsTurnPanelsContainer>();
-			GetSeparationLine().ForEach((c) => c.SetInsideColor(cellColorsDesignData.separationFillColor));
-			GetPlayerSideCells().ForEach((c) => c.SetInsideColor(cellColorsDesignData.playerSideFillColor));
+			BattleManager.instance.GetSeparationLine().ForEach((c) => c.SetInsideColor(cellColorsDesignData.separationFillColor));
+			BattleManager.instance.GetPlayerSideCells().ForEach(c => c.SetInsideColor(cellColorsDesignData.playerSideFillColor));
 			BattleManager.instance.OnShipListUpdate.AddListener(UpdateStartBattleButton);
 			UpdateStartBattleButton();
 		}
 
-		private CellCollection GetPlayerSideCells()
+		private void SetupPlayerSideCell(Cell cell)
 		{
-			CellCollection cells = BattleManager.instance.GridMap.GetAllCells();
-
-			return new CellCollection(cells.Where((c) => c.GridPosition.x < BattleManager.instance.GridXSeparation).ToList());
-		}
-
-		private CellCollection GetSeparationLine()
-		{
-			Vector2Int start = new Vector2Int(BattleManager.instance.GridXSeparation, 0);
-			Vector2Int end = new Vector2Int(BattleManager.instance.GridXSeparation, BattleManager.instance.GridMap.Size.y - 1);
-
-			return BattleManager.instance.GridMap.GetCellLine(start, end, false);
+			cell.SetInteractable(true);
 		}
 
 		public override void Stop()
 		{
 			UIManager.instance.HidePanel<UI.UI_PlaceUnitsTurnPanelsContainer>();
-			GetSeparationLine().ForEach((c) => c.ResetInsideColor());
-			GetPlayerSideCells().ForEach((c) => c.ResetInsideColor());
+			BattleManager.instance.GridMap.ResetAllCells();
 			BattleManager.instance.OnShipListUpdate.RemoveListener(UpdateStartBattleButton);
 		}
 
@@ -62,7 +52,28 @@ namespace Kebab.BattleEngine.GamePhases
 
 		public override void Update()
 		{
+			if (Input.GetMouseButtonUp(1))
+				OnRightClick();
+		}
 
+		private void OnRightClick()
+		{
+			Ship ship = GetShipUnderCursor();
+
+			if (ship)
+			{
+				ship.DestroyIt();
+				MoneyManager.instance.Refound(ship.ShipData.price);
+			}
+		}
+
+		private Ship GetShipUnderCursor()
+		{
+			Cell cell = BattleManager.instance.GridMap.GetHoveredCell();
+
+			if (cell == null)
+				return null;
+			return (cell.PlacedObject as Ship);
 		}
 
 		public override string Name => "Place units";

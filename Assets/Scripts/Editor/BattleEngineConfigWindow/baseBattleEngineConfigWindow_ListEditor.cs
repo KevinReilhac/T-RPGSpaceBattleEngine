@@ -95,7 +95,6 @@ public abstract class baseBattleEngineConfigWindow_ListEditor<SOType> : EditorWi
 
 	public void UpdateObjectList()
 	{
-		Debug.Log("Updated");
 		objects = Resources.LoadAll<SOType>(DataPath).ToList();
 
 		SortList();

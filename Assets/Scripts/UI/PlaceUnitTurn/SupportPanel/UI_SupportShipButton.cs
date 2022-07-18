@@ -21,7 +21,7 @@ namespace Kebab.BattleEngine.UI
 		private void Awake()
 		{
 			button.onClick.AddListener(OnButtonClicked);
-			MoneyManager.instance.OnPriceChange.AddListener(OnMoneyChanged);
+			MoneyManager.instance.OnMoneyChanged.AddListener(OnMoneyChanged);
 		}
 
 		public void Setup(SO_Ship so_ship)

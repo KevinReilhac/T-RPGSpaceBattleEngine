@@ -172,6 +172,11 @@ namespace Kebab.BattleEngine.Map
 
 		#region Getters
 
+		public Cell GetHoveredCell()
+		{
+			return (hoveredCell);
+		}
+
 		public CellCollection GetAllCells()
 		{
 			return (new CellCollection(mapMatrix.Values.ToList()));

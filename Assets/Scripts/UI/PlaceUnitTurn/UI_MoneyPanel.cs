@@ -13,7 +13,7 @@ namespace Kebab.BattleEngine.UI
 
 		private void Awake()
 		{
-			MoneyManager.instance.OnPriceChange.AddListener(UpdateMoney);
+			MoneyManager.instance.OnMoneyChanged.AddListener(UpdateMoney);
 		}
 
 		private void UpdateMoney(int money)

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+using Kebab.BattleEngine.MoneySystem;
 using Kebab.BattleEngine.Ships;
 using Kebab.BattleEngine.Map;
 
@@ -20,12 +22,14 @@ namespace Kebab.BattleEngine.UI
 
 		private Cell currentCell = null;
 
-		public void Setup(SO_Ship shipData, UnityAction<Cell, SO_Ship> callback, CellCollection playerFieldCells)
+		public void Setup(SO_Ship shipData, UnityAction<Cell, SO_Ship> callback)
 		{
 			spriteRenderer.sprite = shipData.sprite;
 			this.shipData = shipData;
 			this.callback = callback;
-			this.playerFieldCells = playerFieldCells;
+
+			playerFieldCells = BattleManager.instance.GetPlayerSideCells().GetOnlyEmpty();
+			playerFieldCells.ForEach((c) => c.SetInteractable(true));
 		}
 
 		private void Update()
@@ -33,6 +37,13 @@ namespace Kebab.BattleEngine.UI
 			UpdatePosition();
 			if (Input.GetMouseButtonDown(0))
 				SpawnShip();
+			if (Input.GetMouseButton(1))
+				Cancel();
+		}
+
+		private void Cancel()
+		{
+			Destroy(gameObject);
 		}
 
 		private void UpdatePosition()
@@ -45,9 +56,15 @@ namespace Kebab.BattleEngine.UI
 
 		private void SpawnShip()
 		{
+			if (EventSystem.current.IsPointerOverGameObject())
+				return;
 			callback.Invoke(currentCell, shipData);
 			Destroy(gameObject);
 		}
 
+		private void OnDestroy()
+		{
+			playerFieldCells.ForEach((c) => c.SetInteractable(false));
+		}
 	}
 }

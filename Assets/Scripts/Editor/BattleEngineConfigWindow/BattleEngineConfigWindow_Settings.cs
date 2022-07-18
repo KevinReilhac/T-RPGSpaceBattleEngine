@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+using Kebab.BattleEngine.Utils.Editor;
 using Kebab.DesignData;
 
 public class BattleEngineConfigWindow_Settings : EditorWindow
@@ -24,9 +25,9 @@ public class BattleEngineConfigWindow_Settings : EditorWindow
 		scrollView = GUILayout.BeginScrollView(scrollView);
 		for (int i = 0; i < designDataEditors.Length; i++)
 		{
-			GUILayout.Label(allDesignData[i].name, EditorStyles.boldLabel);
+			EditorUtils.DrawHeader(allDesignData[i].name);
 			designDataEditors[i].OnInspectorGUI();
-			GuiLine();
+			EditorUtils.HorizontalLine();
 			EditorGUILayout.Space();
 		}
 		GUILayout.EndScrollView();
@@ -36,15 +37,5 @@ public class BattleEngineConfigWindow_Settings : EditorWindow
 	{
 		allDesignData = Resources.LoadAll<baseDesignData>(DESIGN_DATA_PATH);
 		designDataEditors = allDesignData.Select(d => Editor.CreateEditor(d)).ToArray();
-	}
-
-	void GuiLine(int i_height = 1)
-	{
-
-		Rect rect = EditorGUILayout.GetControlRect(false, i_height);
-
-		rect.height = i_height;
-
-		EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 1));
 	}
 }

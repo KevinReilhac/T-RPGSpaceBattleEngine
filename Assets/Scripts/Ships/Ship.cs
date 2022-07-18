@@ -87,9 +87,7 @@ namespace Kebab.BattleEngine.Ships
 
 			if (currentHealth <= 0)
 			{
-				BattleManager.instance.RemoveShip(this);
-				Destroy(gameObject);
-				onDestroy.Invoke();
+				DestroyIt();
 			}
 		}
 
@@ -159,6 +157,13 @@ namespace Kebab.BattleEngine.Ships
 			}
 			else
 				target.ApplyDamages(ON_MISS_DAMAGE_VALUE);
+		}
+
+		public void DestroyIt()
+		{
+			Destroy(gameObject);
+			BattleManager.instance.RemoveShip(this);
+			onDestroy.Invoke();
 		}
 
 		virtual public ShipOwner Owner => ShipOwner.None;

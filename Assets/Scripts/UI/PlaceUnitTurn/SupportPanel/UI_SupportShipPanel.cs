@@ -49,15 +49,7 @@ namespace Kebab.BattleEngine.UI
 			UI_DragAndDropShip dragAndDropShip = Instantiate(dragAndDropShipPrefab);
 
 			BattleManager.instance.UnselectPlayerShip();
-			dragAndDropShip.Setup(shipData, OnShipDropped, GetPlayerFieldCells());
-		}
-
-		private CellCollection GetPlayerFieldCells()
-		{
-			CellCollection allCells = BattleManager.instance.GridMap.GetAllCells();
-			CellCollection placableCells = new CellCollection(allCells.Where((p) => p.GridPosition.x < BattleManager.instance.GridXSeparation).ToList());
-
-			return (placableCells);
+			dragAndDropShip.Setup(shipData, OnShipDropped);
 		}
 
 		private void OnShipDropped(Cell cell, SO_Ship shipData)

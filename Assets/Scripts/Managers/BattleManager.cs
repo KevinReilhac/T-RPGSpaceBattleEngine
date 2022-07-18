@@ -25,14 +25,18 @@ namespace Kebab.BattleEngine
 		EnemyTurn,
 		EndBattle
 	}
+
 	public class BattleManager : Manager<BattleManager>
 	{
 		[SerializeField] private int startMoney = 5000;
 		[SerializeField] private int playfieldSeparationDelta = 0;
+		[SerializeField] private ConditionsHandler conditions = null;
 
 		private baseGrid mapManager = null;
 		private List<Ship> ships = new List<Ship>();
 		private PlayerShip selectedPlayerShip = null;
+		private int currentTurn = 0;
+		private GamePhaseEnum firstGamePhase = GamePhaseEnum.NONE;
 
 
 		//Game phases
@@ -52,7 +56,8 @@ namespace Kebab.BattleEngine
 			MoneyManager.instance.SetMoney(startMoney);
 			UIManager.instance.Init();
 			CreateGamePhases();
-
+			conditions.onWin.AddListener(Victory);
+			conditions.onLose.AddListener(Defeat);
 		}
 
 		private void Start()
@@ -64,21 +69,7 @@ namespace Kebab.BattleEngine
 		{
 			if (gamePhasesDict.ContainsKey(currentGamePhase))
 				gamePhasesDict[currentGamePhase].Update();
-
-			if (currentGamePhase == GamePhaseEnum.PlayerTurn || currentGamePhase == GamePhaseEnum.EnemyTurn)
-			{
-				CheckVictory();
-				CheckDefeat();
-			}
 		}
-
-		private void EndBattle()
-		{
-			SetGamePhase(GamePhaseEnum.EndBattle);
-			SetCanSelectPlayerShips(false);
-			UnselectPlayerShip();
-		}
-
 
 		#region GamePhases
 		private void CreateGamePhases()
@@ -96,6 +87,15 @@ namespace Kebab.BattleEngine
 			if (newGamePhase == currentGamePhase)
 				return;
 
+			if (firstGamePhase == GamePhaseEnum.NONE && (newGamePhase == GamePhaseEnum.PlayerTurn || newGamePhase == GamePhaseEnum.EnemyTurn))
+			{
+				conditions.Init();
+				firstGamePhase = newGamePhase;
+			}
+
+			if (newGamePhase == firstGamePhase)
+				currentTurn++;
+
 			if (gamePhasesDict.ContainsKey(currentGamePhase))
 				gamePhasesDict[currentGamePhase].Stop();
 			if (gamePhasesDict.ContainsKey(newGamePhase))
@@ -106,28 +106,12 @@ namespace Kebab.BattleEngine
 		}
 		#endregion
 
-		#region CheckDefeat
-		///TMP
-		private void CheckDefeat()
-		{
-			if (GetShips(ShipOwner.Player).Count <= 0)
-				Defeat();
-		}
-
+		#region EndBattle
 		private void Defeat()
 		{
 			onDefeat.Invoke();
 			UIManager.instance.ShowPanel<UI_DefeatPanel>();
 			EndBattle();
-		}
-		#endregion
-
-		#region Victory
-		///TMP
-		private void CheckVictory()
-		{
-			if (GetShips(ShipOwner.Enemy).Count <= 0)
-				Victory();
 		}
 
 		private void Victory()
@@ -135,6 +119,14 @@ namespace Kebab.BattleEngine
 			onVictory.Invoke();
 			UIManager.instance.ShowPanel<UI_VictoryPanel>();
 			EndBattle();
+		}
+
+		private void EndBattle()
+		{
+			SetGamePhase(GamePhaseEnum.EndBattle);
+			SetCanSelectPlayerShips(false);
+			UnselectPlayerShip();
+			conditions.Dispose();
 		}
 		#endregion
 
@@ -146,7 +138,6 @@ namespace Kebab.BattleEngine
 
 			foreach (Ship ship in ships)
 			{
-				Debug.Log(ship);
 				ship.IsSelectable = canSelect;
 				if (!canSelect)
 				{
@@ -192,6 +183,22 @@ namespace Kebab.BattleEngine
 		#endregion
 
 		#region Getters
+
+		public CellCollection GetPlayerSideCells()
+		{
+			CellCollection cells = GridMap.GetAllCells();
+
+			return new CellCollection(cells.Where((c) => c.GridPosition.x < BattleManager.instance.GridXSeparation).ToList());
+		}
+
+		public CellCollection GetSeparationLine()
+		{
+			Vector2Int start = new Vector2Int(BattleManager.instance.GridXSeparation, 0);
+			Vector2Int end = new Vector2Int(BattleManager.instance.GridXSeparation, BattleManager.instance.GridMap.Size.y - 1);
+
+			return GridMap.GetCellLine(start, end, false);
+		}
+
 		public List<Ship> GetShips(ShipOwner shipsOwner = ShipOwner.All)
 		{
 			List<Ship> goodOwnerShips = new List<Ship>();
@@ -213,6 +220,11 @@ namespace Kebab.BattleEngine
 			return (typedShips);
 		}
 
+		public int CurrentTurn
+		{
+			get => currentTurn;
+		}
+
 		public UnityEvent OnShipListUpdate
 		{
 			get => onShipListUpdate;
@@ -226,6 +238,11 @@ namespace Kebab.BattleEngine
 		public UnityEvent OnDefeat
 		{
 			get => onDefeat;
+		}
+
+		public UnityEvent<GamePhaseEnum> OnGameStateChanged
+		{
+			get => onGameStateChanged;
 		}
 
 		public UnityEvent<PlayerShip> OnShipSelected
