@@ -5,7 +5,7 @@ using Kebab.BattleEngine.Ships;
 
 namespace Kebab.BattleEngine.Conditions
 {
-	public class TurnXCondition : ACondition
+	public class TurnXCondition : baseCondition
 	{
 		[SerializeField, Min(2)] private int targetTurn = 2;
 

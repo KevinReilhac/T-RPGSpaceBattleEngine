@@ -6,7 +6,7 @@ using Kebab.BattleEngine.Ships;
 namespace Kebab.BattleEngine.Conditions
 {
 	[System.Serializable]
-	public class AllShipsDestroyed : ACondition
+	public class AllShipsDestroyed : baseCondition
 	{
 		public enum Target
 		{

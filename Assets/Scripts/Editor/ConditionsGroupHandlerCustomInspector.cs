@@ -25,9 +25,9 @@ namespace Kebab.BattleEngine.Conditions.EditorTools
 			if (target == null)
 				return;
 
-			conditionsTypes = ReflectionUtils.GetAllSubtypes(typeof(ACondition));
+			conditionsTypes = ReflectionUtils.GetAllSubtypes(typeof(baseCondition));
 
-			group.conditions = group.gameObject.GetComponentsInChildren<ACondition>().ToList();
+			group.conditions = group.gameObject.GetComponentsInChildren<baseCondition>().ToList();
 			conditionsEditors = group.conditions.Select((c) => Editor.CreateEditor(c)).ToList();
 		}
 
@@ -70,14 +70,14 @@ namespace Kebab.BattleEngine.Conditions.EditorTools
 			GameObject go = new GameObject(type.Name, type);
 
 			go.transform.parent = group.transform;
-			ACondition condition = go.GetComponent<ACondition>();
+			baseCondition condition = go.GetComponent<baseCondition>();
 			group.conditions.Add(condition);
 			conditionsEditors.Add(Editor.CreateEditor(condition));
 		}
 
 		public void RemoveCondition(Editor conditionEditor)
 		{
-			ACondition condition = (ACondition)conditionEditor.target;
+			baseCondition condition = (baseCondition)conditionEditor.target;
 			group.conditions.Remove(condition);
 			DestroyImmediate(condition.gameObject);
 			conditionsEditors.Remove(conditionEditor);

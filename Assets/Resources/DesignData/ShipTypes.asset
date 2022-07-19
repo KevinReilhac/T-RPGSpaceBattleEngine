@@ -17,6 +17,7 @@ MonoBehaviour:
   - Cruiser
   - Type 3
   - Type 4
+  - TEST
   damagesFromTypes:
   - type: 0
     damagesFromType:

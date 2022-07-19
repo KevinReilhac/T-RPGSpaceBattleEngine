@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 566d5d6ec5bfb414ca11f97ae0b9a101, type: 3}
   m_Name: Missile
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: 80e2587c95ea8b84bbe28cea104f52d7, type: 3}
+  sprite: {fileID: 21300000, guid: 4160ce10319e3c94f881f0a64c0dd1c7, type: 3}
   attackName: Missile
   precision: 21
   damages:
@@ -25,3 +25,5 @@ MonoBehaviour:
   ignoreFlac: 0
   ignoreArmor: 1
   attackVisual: {fileID: 5176684900161149232, guid: 5c86929b2a1a82a4fa24ea173e21aa5b, type: 3}
+  onStartClip: {fileID: 0}
+  onOnHitClip: {fileID: 0}

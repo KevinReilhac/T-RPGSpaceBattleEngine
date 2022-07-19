@@ -5,7 +5,7 @@ using UnityEngine.Events;
 namespace Kebab.BattleEngine.Conditions
 {
 	[System.Serializable]
-	public class ACondition : MonoBehaviour
+	public class baseCondition : MonoBehaviour
 	{
 		public virtual bool IsComplete() {return false;}
 		public virtual string ConditionTitle { get; }

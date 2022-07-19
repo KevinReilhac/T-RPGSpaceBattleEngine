@@ -8,14 +8,14 @@ namespace Kebab.BattleEngine.Conditions
 	[System.Serializable]
 	public class ConditionsGroup : MonoBehaviour
 	{
-		public List<ACondition> conditions = new List<ACondition>();
+		public List<baseCondition> conditions = new List<baseCondition>();
 
 		private UnityEvent onComplete = new UnityEvent();
 		private int completed = 0;
 
 		public void Init()
 		{
-			foreach (ACondition condition in conditions)
+			foreach (baseCondition condition in conditions)
 			{
 				condition.OnConditionComplete.AddListener(UpdateCompletedConditions);
 				condition.Init();
@@ -24,7 +24,7 @@ namespace Kebab.BattleEngine.Conditions
 
 		public void Dispose()
 		{
-			foreach (ACondition condition in conditions)
+			foreach (baseCondition condition in conditions)
 				condition.OnConditionComplete.RemoveListener(UpdateCompletedConditions);
 		}
 

@@ -4,7 +4,7 @@ using Kebab.BattleEngine.Ships;
 
 namespace Kebab.BattleEngine.Conditions
 {
-	public class ShipDestroyed : ACondition
+	public class ShipDestroyed : baseCondition
 	{
 		[SerializeField] private Ship targetShip = null;
 
