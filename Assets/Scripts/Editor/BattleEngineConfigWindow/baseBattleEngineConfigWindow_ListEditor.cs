@@ -54,6 +54,7 @@ public abstract class baseBattleEngineConfigWindow_ListEditor<SOType> : EditorWi
 
 	private void Create()
 	{
+		Debug.Log(typeof(SOType).Name);
 		BattleEngineConfigWindow_SOEditor.CreateWindow<SOType>(DataPath, UpdateObjectList);
 	}
 

@@ -18,9 +18,13 @@ MonoBehaviour:
   - Type 3
   - Type 4
   - TEST
+  - TEST
+  - TEST
   damagesFromTypes:
   - type: 0
     damagesFromType:
+    - 1
+    - 1
     - 1
     - 1
     - 1
@@ -33,8 +37,12 @@ MonoBehaviour:
     - 1
     - 1
     - 1
+    - 1
+    - 1
   - type: 2
     damagesFromType:
+    - 1
+    - 1
     - 1
     - 1
     - 1
@@ -47,8 +55,30 @@ MonoBehaviour:
     - 1
     - 1
     - 1
+    - 1
+    - 1
   - type: 4
     damagesFromType:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+  - type: 5
+    damagesFromType:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+  - type: 6
+    damagesFromType:
+    - 1
+    - 1
     - 1
     - 1
     - 1

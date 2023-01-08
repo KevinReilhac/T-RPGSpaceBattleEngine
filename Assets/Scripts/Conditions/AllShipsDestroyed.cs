@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Kebab.BattleEngine.Ships;
+using Kebab.BattleEngine.Logs;
 
 namespace Kebab.BattleEngine.Conditions
 {
@@ -29,17 +30,17 @@ namespace Kebab.BattleEngine.Conditions
 
 		private void OnShipDestroyed(Ship ship)
 		{
-			Debug.Log("Destroyed");
 			targetShips.Remove(ship);
 			onConditionUpdated.Invoke();
 
+
+			BattleEngineLogs.Log(LogVerbosity.High, "Condition {0} : {1} {2} ships remaining", ConditionTitle, targetShips.Count, owner);
 			if (IsComplete())
 				onConditionComplete.Invoke();
 		}
 
 		public override bool IsComplete()
 		{
-			Debug.Log("Complete");
 			return targetShips.Count == 0;
 		}
 

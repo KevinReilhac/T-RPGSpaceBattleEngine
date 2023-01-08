@@ -38,7 +38,7 @@ public class BattleEngineConfigWindow_SOEditor : EditorWindow
 		wnd.ShowPopup();
 
 		updateCallback = onCreated;
-		target = ScriptableObject.CreateInstance<SO_Ship>();
+		target = ScriptableObject.CreateInstance<T>();
 		isCreate = true;
 		editor = Editor.CreateEditor(target);
 		savePath = path;
@@ -51,9 +51,11 @@ public class BattleEngineConfigWindow_SOEditor : EditorWindow
 		target.name = EditorGUILayout.TextField("Name", target.name);
 		editor.OnInspectorGUI();
 
-		GUI.enabled = CanSave();
+
+		GUILayout.FlexibleSpace();
 		if (isCreate)
 		{
+			GUI.enabled = CanSave();
 			if (GUILayout.Button(new GUIContent("Save", EditorGUIUtility.IconContent("SaveAs").image)))
 				Save();
 		}

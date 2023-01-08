@@ -9,6 +9,7 @@ using Kebab.BattleEngine.Audio;
 using Kebab.BattleEngine.Map;
 using Kebab.BattleEngine.Attacks;
 using Kebab.BattleEngine.Difficulty;
+using Kebab.BattleEngine.Logs;
 using Kebab.BattleEngine.Ships.AI;
 
 
@@ -79,11 +80,13 @@ namespace Kebab.BattleEngine.Ships
 		{
 			if (damages == ON_MISS_DAMAGE_VALUE)
 			{
+				BattleEngineLogs.Log(LogVerbosity.High, "{0} Evade attack", name);
 				onHit.Invoke(ON_MISS_DAMAGE_VALUE);
 				return;
 			}
 			currentHealth -= damages;
 			onHit.Invoke(damages);
+			BattleEngineLogs.Log(LogVerbosity.High, "{0} damages on", damages, name);
 
 			if (currentHealth <= 0)
 			{
@@ -97,6 +100,8 @@ namespace Kebab.BattleEngine.Ships
 			int precision = GetPrecision(attack, target);
 
 			AudioManager.instance.PlaySFX(attack.onStartClip);
+
+			BattleEngineLogs.Log(LogVerbosity.High, "{0} attack {1} with {2}", name, target.name, attack.name);
 			if (attack.attackVisual != null)
 			{
 				AttackVisual visual = Instantiate(attack.attackVisual, transform.parent);
@@ -164,6 +169,7 @@ namespace Kebab.BattleEngine.Ships
 			Destroy(gameObject);
 			BattleManager.instance.RemoveShip(this);
 			onDestroy.Invoke();
+			BattleEngineLogs.Log(LogVerbosity.High, "{0} destroyed", name);
 		}
 
 		virtual public ShipOwner Owner => ShipOwner.None;

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Kebab.BattleEngine.Ships;
+using Kebab.BattleEngine.Logs;
 
 
 namespace Kebab.BattleEngine.Conditions
@@ -20,7 +21,7 @@ namespace Kebab.BattleEngine.Conditions
 		{
 			currentTurn = BattleManager.instance.CurrentTurn;
 			onConditionUpdated.Invoke();
-
+			BattleEngineLogs.Log(LogVerbosity.High, "Condition {0} : {1}/{2}", ConditionTitle, currentTurn, targetTurn);
 			if (IsComplete())
 				onConditionComplete.Invoke();
 		}

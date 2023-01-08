@@ -40,7 +40,7 @@ public class BattleEngineConfigWindow_Attacks : baseBattleEngineConfigWindow_Lis
 		str.AppendLine(target.name);
 		str.AppendLine("");
 		str.AppendLine($"Damages : {target.damages}");
-		str.AppendLine($"Health : {target.normalDistanceRange}");
+		str.AppendLine($"Range : {target.normalDistanceRange}");
 		str.AppendLine($"Precision : {target.precision}");
 
 		return (str.ToString());

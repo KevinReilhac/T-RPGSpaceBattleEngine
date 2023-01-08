@@ -13,6 +13,7 @@ using Kebab.BattleEngine.Map;
 using Kebab.BattleEngine.UI;
 using Kebab.BattleEngine.MoneySystem;
 using Kebab.BattleEngine.Conditions;
+using Kebab.BattleEngine.Logs;
 
 namespace Kebab.BattleEngine
 {
@@ -101,6 +102,7 @@ namespace Kebab.BattleEngine
 			if (gamePhasesDict.ContainsKey(newGamePhase))
 				gamePhasesDict[newGamePhase].Begin();
 
+			BattleEngineLogs.Log(LogVerbosity.Low, "Change gamephase ({0} => {1})", currentGamePhase, newGamePhase);
 			currentGamePhase = newGamePhase;
 			onGameStateChanged.Invoke(currentGamePhase);
 		}
@@ -111,6 +113,7 @@ namespace Kebab.BattleEngine
 		{
 			onDefeat.Invoke();
 			UIManager.instance.ShowPanel<UI_DefeatPanel>();
+			BattleEngineLogs.Log(LogVerbosity.Low, "DEFEAT");
 			EndBattle();
 		}
 
@@ -118,6 +121,7 @@ namespace Kebab.BattleEngine
 		{
 			onVictory.Invoke();
 			UIManager.instance.ShowPanel<UI_VictoryPanel>();
+			BattleEngineLogs.Log(LogVerbosity.Low, "WIN");
 			EndBattle();
 		}
 

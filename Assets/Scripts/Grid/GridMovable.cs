@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using DG.Tweening;
 using NaughtyAttributes;
+using Kebab.BattleEngine.Logs;
 
 namespace Kebab.BattleEngine.Map
 {
@@ -30,6 +31,7 @@ namespace Kebab.BattleEngine.Map
 				if (onEndMove != null)
 					onEndMove.Invoke();
 			});
+			BattleEngineLogs.Log(LogVerbosity.High, "{0} Move ({1} => {2})", name, GridPosition, moveGridPosition);
 		}
 
 		public void MoveTo(Vector2 moveWorldPosition, UnityAction onEndMove = null)
