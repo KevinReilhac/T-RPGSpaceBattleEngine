@@ -24,6 +24,7 @@ namespace Kebab.BattleEngine.Ships.UI
 
 		private ShipTypesDesignData shipTypes = null;
 		private Ship ship = null;
+		private float hpFillImageDefaultWidth = 0f;
 
 		private void Awake()
 		{
@@ -47,7 +48,7 @@ namespace Kebab.BattleEngine.Ships.UI
 				return;
 
 			shipNameText.text = ship.ShipName;
-			hpFillImage.fillAmount = ship.CurrentHealth / ship.MaxHealth;
+			hpFillImage.fillAmount = (float)ship.CurrentHealth / (float)ship.MaxHealth;
 			actionPoints.Setup(ship.MaxActionPoints, ship.CurrentActionPoints);
 			typeText.text = shipTypes.types[ship.ShipType].ToString();
 			speedText.text = ship.ShipData.speed.ToString() + GetBuffString(ship.Buffs.speed);

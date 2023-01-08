@@ -16,23 +16,22 @@ namespace Kebab.BattleEngine.UI
 	{
 		[Header("References")]
 		[SerializeField] private Transform content = null;
-		[SerializeField] private List<SO_Ship> shipList = null;
 		[SerializeField] private Transform shipsParent = null;
 		[Header("Prefabs")]
 		[SerializeField] private UI_SupportShipButton buttonPrefab = null;
 		[SerializeField] private UI_DragAndDropShip dragAndDropShipPrefab = null;
 		[SerializeField] private PlayerShip shipPrefab = null;
+		
+        public override void Init()
+        {
+            base.Init();
+        }
 
-		private void Awake()
-		{
-			InitShipList();
-		}
-
-		private void InitShipList()
+		public void InitShipList(List<SO_Ship> playerShipList)
 		{
 			content.ClearChilds();
 
-			foreach (SO_Ship ship in shipList)
+			foreach (SO_Ship ship in playerShipList)
 				CreateShipButton(ship);
 		}
 
@@ -57,8 +56,10 @@ namespace Kebab.BattleEngine.UI
 			Ship ship = Instantiate(shipPrefab, cell.transform.position, Quaternion.identity, shipsParent);
 
 			MoneyManager.instance.Pay(shipData.price);
+			BattleManager.instance.GridMap.SetHoveredCell(null);
 			ship.SetupData(shipData);
 			ship.AlignToGrid();
+			ship.name = string.Format("{0} (1)", ship.ShipName, BattleManager.instance.GetShips(ShipOwner.Player).Count);
 		}
 	}
 }

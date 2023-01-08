@@ -20,6 +20,7 @@ namespace Kebab.BattleEngine.GamePhases
 
 		public PlaceUnitsGamePhase()
 		{
+			Debug.Log("test");
 			cellColorsDesignData = DesignDataManager.Get<CellColorsDesignData>();
 			startBattleButton = UIManager.instance.GetPanel<UI_StartBattleButton>();
 		}
@@ -52,28 +53,7 @@ namespace Kebab.BattleEngine.GamePhases
 
 		public override void Update()
 		{
-			if (Input.GetMouseButtonUp(1))
-				OnRightClick();
-		}
 
-		private void OnRightClick()
-		{
-			Ship ship = GetShipUnderCursor();
-
-			if (ship)
-			{
-				ship.DestroyIt();
-				MoneyManager.instance.Refound(ship.ShipData.price);
-			}
-		}
-
-		private Ship GetShipUnderCursor()
-		{
-			Cell cell = BattleManager.instance.GridMap.GetHoveredCell();
-
-			if (cell == null)
-				return null;
-			return (cell.PlacedObject as Ship);
 		}
 
 		public override string Name => "Place units";

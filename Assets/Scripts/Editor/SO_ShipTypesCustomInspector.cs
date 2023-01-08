@@ -84,7 +84,12 @@ namespace Kebab.BattleEngine.Ships.EditorTools
 				for (int y = 0; y < shipTypes.types.Count; y++)
 				{
 					EditorGUILayout.BeginVertical();
-					shipTypes.damagesFromTypes[x].damagesFromType[y] = EditorGUILayout.FloatField(shipTypes.damagesFromTypes[x].damagesFromType[y]);
+					float newValue = EditorGUILayout.FloatField(shipTypes.damagesFromTypes[x].damagesFromType[y]);
+					if (newValue != shipTypes.damagesFromTypes[x].damagesFromType[y])
+					{
+						EditorUtility.SetDirty(shipTypes);
+						shipTypes.damagesFromTypes[x].damagesFromType[y] = newValue;
+					}
 					EditorGUILayout.EndVertical();
 				}
 				EditorGUILayout.EndHorizontal();

@@ -27,13 +27,18 @@ namespace Kebab.BattleEngine.Ships
 		{
 			get
 			{
-				ShipTypesDesignData shipTypes = DesignDataManager.Get<ShipTypesDesignData>();
+				ShipTypesDesignData shipTypes = GetShipTypesDesignData();
 				DropdownList<int> list = new DropdownList<int>();
 
 				for (int i = 0; i < shipTypes.types.Count; i++)
 					list.Add(shipTypes.types[i], i);
 				return (list);
 			}
+		}
+
+		private ShipTypesDesignData GetShipTypesDesignData()
+		{
+			return Resources.Load<ShipTypesDesignData>("DesignData/ShipTypes");
 		}
 
 		public void SuckData(in SO_Ship ship)

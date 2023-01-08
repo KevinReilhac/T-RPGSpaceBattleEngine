@@ -13,7 +13,7 @@ public class BattleTestButton : MonoBehaviour
 
 	private void Awake()
 	{
-		battle = new Battle(0, Win, Lose);
+		battle = new Battle(0, Win, Lose, 3000, null);
 		button.onClick.AddListener(Load);
 	}
 

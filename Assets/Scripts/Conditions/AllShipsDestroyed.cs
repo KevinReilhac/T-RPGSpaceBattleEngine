@@ -24,7 +24,7 @@ namespace Kebab.BattleEngine.Conditions
 		{
 			targetShips = BattleManager.instance.GetShips(owner == Target.Player ? ShipOwner.Player : ShipOwner.Enemy);
 			foreach (Ship targetShip in targetShips)
-				targetShip.OnDestroy.AddListener(() => OnShipDestroyed(targetShip));
+				targetShip.OnShipDestroy.AddListener(() => OnShipDestroyed(targetShip));
 			startShipNumber = targetShips.Count;
 		}
 

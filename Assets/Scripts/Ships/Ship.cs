@@ -30,7 +30,7 @@ namespace Kebab.BattleEngine.Ships
 		public const int ON_MISS_DAMAGE_VALUE = -999999999;
 
 		[Header("References")]
-		[SerializeField] private UnityEvent onDestroy = null;
+		[SerializeField] private UnityEvent onShipDestroy = null;
 		[SerializeField] protected SO_Ship shipData = null;
 
 		private SpriteRenderer spriteRenderer = null;
@@ -69,6 +69,7 @@ namespace Kebab.BattleEngine.Ships
 				return;
 			this.shipData = shipData;
 			spriteRenderer.sprite = shipData.sprite;
+			ResetStats();
 		}
 
 		public List<Cell> GetMoveRangeCells()
@@ -86,7 +87,7 @@ namespace Kebab.BattleEngine.Ships
 			}
 			currentHealth -= damages;
 			onHit.Invoke(damages);
-			BattleEngineLogs.Log(LogVerbosity.High, "{0} damages on", damages, name);
+			BattleEngineLogs.Log(LogVerbosity.High, "{0} damages on {1}", damages, name);
 
 			if (currentHealth <= 0)
 			{
@@ -108,9 +109,9 @@ namespace Kebab.BattleEngine.Ships
 
 				visual.Setup(GridPosition, target.GridPosition, () =>
 					{
-						onAttackEnd?.Invoke();
 						ApplyDamagesToTarget(attack.ignoreEvade, damages, precision, target);
 						AudioManager.instance.PlaySFX(attack.onOnHitClip);
+						onAttackEnd?.Invoke();
 					}
 				);
 			}
@@ -167,9 +168,11 @@ namespace Kebab.BattleEngine.Ships
 		public void DestroyIt()
 		{
 			Destroy(gameObject);
+			onShipDestroy.Invoke();
+			IsSelectable = false;
+			Cell.SetDisabledOutlineColor();
+			BattleEngineLogs.Log(LogVerbosity.Low, "{0} destroyed", name);
 			BattleManager.instance.RemoveShip(this);
-			onDestroy.Invoke();
-			BattleEngineLogs.Log(LogVerbosity.High, "{0} destroyed", name);
 		}
 
 		virtual public ShipOwner Owner => ShipOwner.None;
@@ -235,9 +238,9 @@ namespace Kebab.BattleEngine.Ships
 			get => onHit;
 		}
 
-		public UnityEvent OnDestroy
+		public UnityEvent OnShipDestroy
 		{
-			get => onDestroy;
+			get => onShipDestroy;
 		}
 
 		public SO_Ship ShipData

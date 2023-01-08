@@ -25,13 +25,13 @@ namespace Kebab.BattleEngine.Map
 			if (target == null)
 				return;
 
+			BattleEngineLogs.Log(LogVerbosity.High, "{0} Move ({1} => {2})", name, GridPosition, moveGridPosition);
 			SetCell(BattleManager.instance.GridMap.GetCell(moveGridPosition));
 			transform.DOMove(target, moveTime).SetEase(moveAnimationEaseCurve).OnComplete(() =>
 			{
 				if (onEndMove != null)
 					onEndMove.Invoke();
 			});
-			BattleEngineLogs.Log(LogVerbosity.High, "{0} Move ({1} => {2})", name, GridPosition, moveGridPosition);
 		}
 
 		public void MoveTo(Vector2 moveWorldPosition, UnityAction onEndMove = null)

@@ -281,7 +281,8 @@ namespace Kebab.BattleEngine.Map
 			if (hoveredCell)
 				hoveredCell.SetSelectableOutlineColor();
 			hoveredCell = cell;
-			hoveredCell.SetHoveredColor();
+			if (hoveredCell)
+				hoveredCell.SetHoveredColor();
 		}
 
 		public void CellClicked(Cell cell)

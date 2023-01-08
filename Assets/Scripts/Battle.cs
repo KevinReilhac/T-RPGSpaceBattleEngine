@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
+using Kebab.BattleEngine.Ships;
 
 
 namespace Kebab.BattleEngine
@@ -15,22 +16,20 @@ namespace Kebab.BattleEngine
 		private Scene currentScene = default(Scene);
 		private Scene battleScene = default(Scene);
 
-		public Battle(int sceneBuildIndex, UnityAction winCallback, UnityAction loseCallback)
+		public Battle(int sceneBuildIndex, UnityAction winCallback, UnityAction loseCallback, int startMoney, List<Ship> ships)
 		{
 			this.sceneBuildIndex = sceneBuildIndex;
 			this.winCallback = winCallback;
 			this.loseCallback = loseCallback;
-
-			Debug.Log(sceneBuildIndex);
 		}
 
-		public static Battle CreateByName(string sceneName, UnityAction winCallback, UnityAction loseCallback)
+		public static Battle CreateByName(string sceneName, UnityAction winCallback, UnityAction loseCallback, int startMoney, List<Ship> ships)
 		{
 			Scene scene = SceneManager.GetSceneByName(sceneName);
 
 			if (scene == null)
 				throw new System.ArgumentException("Scene not exist.");
-			return new Battle(SceneManager.GetSceneByName(sceneName).buildIndex, winCallback, loseCallback);
+			return new Battle(SceneManager.GetSceneByName(sceneName).buildIndex, winCallback, loseCallback, startMoney, ships);
 		}
 
 		public void Load()
@@ -78,8 +77,7 @@ namespace Kebab.BattleEngine
 
 		private void CloseBattleScene()
 		{
-			SceneManager.UnloadSceneAsync(battleScene);
-			EnableCurrentScene();
+			SceneManager.UnloadSceneAsync(battleScene).completed += (_) => EnableCurrentScene();
 		}
 	}
 }

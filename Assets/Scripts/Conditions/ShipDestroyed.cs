@@ -12,7 +12,7 @@ namespace Kebab.BattleEngine.Conditions
 
 		public override void Init()
 		{
-			targetShip.OnDestroy.AddListener(OnShipDestroyed);
+			targetShip.OnShipDestroy.AddListener(OnShipDestroyed);
 		}
 
 		private void OnShipDestroyed()

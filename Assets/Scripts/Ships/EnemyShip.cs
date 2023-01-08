@@ -24,7 +24,6 @@ namespace Kebab.BattleEngine.Ships
 		{
 			base.Awake();
 			SetupAI();
-			ai.SetupShip(this);
 		}
 
 		private void SetupAI()
@@ -37,6 +36,7 @@ namespace Kebab.BattleEngine.Ships
 			else
 			{
 				Debug.LogErrorFormat("{0} AI not found", aiType.typeName);
+				DestroyIt();
 			}
 		}
 

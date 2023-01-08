@@ -10,8 +10,7 @@ namespace Kebab.BattleEngine.SaveLoadSystem
 	public class BattleMapSaveModel
 	{
 		public List<ShipSaveModel> ships = new List<ShipSaveModel>();
-		public Vector2Int gridSize = Vector2Int.zero;
-		public GridType gridType = GridType.HEX;
+		public int sceneId = 0;
 
 		private static BattleMapSaveModel Load(string path)
 		{
@@ -22,8 +21,6 @@ namespace Kebab.BattleEngine.SaveLoadSystem
 
 		public void Save(string path)
 		{
-			string data = JsonUtility.ToJson(this);
-
 			File.WriteAllText(path, JsonUtility.ToJson(this, true));
 		}
 	}
